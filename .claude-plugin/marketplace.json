@@ -1,0 +1,13 @@
+{
+  "name": "nambikkai",
+  "owner": {
+    "name": "The Nambikkai authors"
+  },
+  "plugins": [
+    {
+      "name": "nambikkai",
+      "source": "./plugin",
+      "description": "Trust, with receipts — a redaction perimeter, provenance receipts, and incidents-as-evals for the agent system you already run."
+    }
+  ]
+}

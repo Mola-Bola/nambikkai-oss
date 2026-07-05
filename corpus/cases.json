@@ -1,0 +1,147 @@
+{
+  "_readme": "Nambikkai golden corpus. ALL values synthetic. Inputs carry a '~~' splitter inside sensitive-shaped tokens so this tracked file never contains a matchable identifier at rest; runners strip '~~' before testing. Groups: must_mask (guard must catch) / must_stay (guard must not touch) / known_overmatch (documented false-positive shapes — warn, never block) / known_gap (documented misses — honest debt, not hidden). Every incident in a deployment becomes a new case here.",
+  "must_mask": [
+    {
+      "id": "R-01",
+      "kind": "nric",
+      "input": "FIN on the permit is S12~~34567D as printed.",
+      "note": "SG NRIC/FIN, S-prefix"
+    },
+    {
+      "id": "R-02",
+      "kind": "nric",
+      "input": "work permit ref G76~~54321K arrived",
+      "note": "G-prefix FIN"
+    },
+    {
+      "id": "R-03",
+      "kind": "passport",
+      "input": "passport K12~~34567 expires next July",
+      "note": "letter + 7 digits"
+    },
+    {
+      "id": "R-04",
+      "kind": "passport",
+      "input": "old travel doc E123~~45678 superseded",
+      "note": "letter + 8 digits"
+    },
+    {
+      "id": "R-05",
+      "kind": "phone",
+      "input": "call the agent on 0412 3~~45 678 after lunch",
+      "note": "AU mobile, spaced"
+    },
+    {
+      "id": "R-06",
+      "kind": "phone",
+      "input": "sms 04123~~45678 to confirm",
+      "note": "AU mobile, compact"
+    },
+    {
+      "id": "R-07",
+      "kind": "dob",
+      "input": "DOB listed as 14/0~~3/1989 on the form",
+      "note": "dd/mm/yyyy"
+    },
+    {
+      "id": "R-08",
+      "kind": "account",
+      "input": "card 4111 1111~~ 1111 1111 was cleared in full",
+      "note": "16-digit PAN, spaced"
+    },
+    {
+      "id": "R-09",
+      "kind": "account",
+      "input": "BSB+acct 062-000-1234~~5678-90 on the transfer",
+      "note": "digits w/ dashes ≥12"
+    },
+    {
+      "id": "R-10",
+      "kind": "brokerage",
+      "input": "wire ref AB12~~CD34EF from the broker",
+      "note": "mixed alnum ≥6"
+    }
+  ],
+  "must_stay": [
+    {
+      "id": "C-01",
+      "input": "62 dives logged since 2018 across 9 regions."
+    },
+    {
+      "id": "C-02",
+      "input": "Chapter 12 — Patagonia, part 2, twenty-one nights."
+    },
+    {
+      "id": "C-03",
+      "input": "migrations 0002-0006 applied with owner-scoped RLS."
+    },
+    {
+      "id": "C-04",
+      "input": "visa window opens mid-May 2027; file on clearance."
+    },
+    {
+      "id": "C-05",
+      "input": "The roadmap is the north star; approvals stay human."
+    },
+    {
+      "id": "C-06",
+      "input": "swim, stretch and journal hold the weekly rhythm"
+    },
+    {
+      "id": "C-07",
+      "input": "open follow-ups held at a target of 5"
+    }
+  ],
+  "known_overmatch": [
+    {
+      "id": "O-01",
+      "kind": "passport",
+      "input": "grant doc AC20~~91447 (a case ref, not a passport)",
+      "note": "2 letters + 7 digits — passport rule fires; safe direction"
+    },
+    {
+      "id": "O-02",
+      "kind": "passport",
+      "input": "flight QF80~~23417 lands at 0640",
+      "note": "booking-code shape; over-redacts"
+    },
+    {
+      "id": "O-03",
+      "kind": "dob",
+      "input": "anniversary logged 03/0~~9/2024 at the registry",
+      "note": "ANY dd/mm/yyyy date masks to MM/YYYY — plain dates lose the day"
+    },
+    {
+      "id": "O-04",
+      "kind": "brokerage",
+      "input": "tracking COVI~~D19 tail effects",
+      "note": "any ≥6 mixed-alnum token matches brokerage"
+    }
+  ],
+  "known_gap": [
+    {
+      "id": "G-01",
+      "incident": "I-002/I-007",
+      "input": "Talked with therapist Mira Okonkwo-Reyes today, went well.",
+      "note": "free-text third-party names are regex-invisible — the class that leaked 2026-07-03"
+    },
+    {
+      "id": "G-02",
+      "incident": "I-007",
+      "input": "balance came to 17,250.75 SGD after the transfer",
+      "note": "bare money amounts (<12 digits) pass isClean — the class that leaked 2026-07-03"
+    },
+    {
+      "id": "G-03",
+      "incident": "I-004",
+      "input": "meet at 14 Willowbrae Crescent around noon",
+      "note": "street addresses unguarded by regex; at-rest rule is the only net"
+    },
+    {
+      "id": "G-04",
+      "incident": "I-002",
+      "input": "the payor shown was Tavish Anand s/o Kuppusamy",
+      "note": "synthetic legal name w/ patronymic; role-based rule (Claude-side) is the only net"
+    }
+  ]
+}

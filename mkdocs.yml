@@ -1,0 +1,51 @@
+site_name: Nambikkai
+site_description: "Trust, with receipts — the trust component for agent systems."
+site_url: https://YOUR-GITHUB-USER.github.io/nambikkai/
+repo_url: https://github.com/YOUR-GITHUB-USER/nambikkai
+repo_name: YOUR-GITHUB-USER/nambikkai
+copyright: "© 2026 The Nambikkai authors · நம்பிக்கை — trust, faith, hope"
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.sections
+    - navigation.footer
+    - content.code.copy
+    - toc.integrate
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Concepts:
+      - Receipts: concepts/receipts.md
+      - The Perimeter: concepts/perimeter.md
+      - Drills: concepts/drills.md
+      - The Gate: concepts/gate.md
+  - Reference:
+      - Hook contract: reference/hooks.md
+      - Corpus schema: reference/corpus.md
+      - Rule pack & known gaps: reference/patterns.md
+  - Recipes:
+      - Install into PAI / LifeOS: recipes/pai-lifeos.md
+      - Bare Claude Code project: recipes/bare-claude-code.md
+      - Your first incident eval: recipes/first-incident-eval.md
+  - Philosophy: philosophy.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - tables

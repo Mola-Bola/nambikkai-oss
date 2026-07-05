@@ -1,0 +1,11 @@
+{
+  "name": "nambikkai",
+  "description": "Trust, with receipts. A redaction perimeter, provenance receipts, and incidents-as-evals for the agent system you already run.",
+  "version": "0.1.0",
+  "author": {
+    "name": "The Nambikkai authors"
+  },
+  "homepage": "https://github.com/YOUR-GITHUB-USER/nambikkai",
+  "license": "MIT",
+  "keywords": ["trust", "redaction", "provenance", "guardrails", "hooks", "privacy"]
+}

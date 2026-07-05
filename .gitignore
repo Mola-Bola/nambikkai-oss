@@ -1,0 +1,5 @@
+.nambikkai/
+tests/.test-alerts.log
+site/
+__pycache__/
+.DS_Store
