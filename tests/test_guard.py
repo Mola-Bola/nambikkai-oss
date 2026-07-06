@@ -128,7 +128,45 @@ def classifier_tier():
     if rc != 0:
         fails.append(f"classifier: enabled+keyless must fail OPEN (rc 0), got rc {rc}")
 
-    # (b) live calibration, only with a key: every expected case must flag.
+    # (b) block-mode contract, offline + deterministic: stub classify() in
+    # process and drive classifier_pass directly. Block mode refuses, warn
+    # tier doesn't, the override downgrades — no API involved.
+    import io
+    import classifier as clf
+    import guard
+    orig_classify, orig_log, orig_override = clf.classify, guard.ALERT_LOG, guard.OVERRIDE
+    orig_stderr = sys.stderr
+    try:
+        guard.ALERT_LOG = tmplog
+        clf.classify = lambda text: [{"kind": "name", "text": "Zork Blen"}]
+        sys.stderr = io.StringIO()  # swallow the announce lines
+
+        os.environ["NAMBIKKAI_CLASSIFIER"] = "block"
+        guard.OVERRIDE = False
+        if guard.classifier_pass("Write", "payment from Zork Blen received") is not True:
+            fails.append("classifier block-mode: finding must demand refusal (True)")
+        if "Zork Blen" in sys.stderr.getvalue():
+            fails.append("classifier block-mode: raw span echoed in the block message")
+
+        guard.OVERRIDE = True
+        if guard.classifier_pass("Write", "payment from Zork Blen received") is not False:
+            fails.append("classifier block-mode: NAMBIKKAI_ALLOW_RAW must downgrade to allow")
+
+        os.environ["NAMBIKKAI_CLASSIFIER"] = "warn"
+        guard.OVERRIDE = False
+        if guard.classifier_pass("Write", "payment from Zork Blen received") is not False:
+            fails.append("classifier warn tier: finding must allow (False)")
+
+        clf.classify = lambda text: None  # API failure
+        os.environ["NAMBIKKAI_CLASSIFIER"] = "block"
+        if guard.classifier_pass("Write", "anything at all here") is not False:
+            fails.append("classifier block-mode: API failure must fail OPEN even in block mode")
+    finally:
+        clf.classify, guard.ALERT_LOG, guard.OVERRIDE = orig_classify, orig_log, orig_override
+        sys.stderr = orig_stderr
+        os.environ.pop("NAMBIKKAI_CLASSIFIER", None)
+
+    # (c) live calibration, only with a key: every expected case must flag.
     if os.environ.get("ANTHROPIC_API_KEY", "").strip():
         import classifier
         os.environ["NAMBIKKAI_CLASSIFIER"] = "1"

@@ -56,25 +56,41 @@ def high_risk(tool):
 
 
 def classifier_pass(tool, text):
-    """Opt-in warn-tier LLM pass, run ONLY when the deterministic sweep is
-    clean on a high-risk tool. Warns + logs; never blocks, never raises."""
+    """Opt-in LLM pass, run ONLY when the deterministic sweep is clean on a
+    high-risk tool. Returns True when block mode (`NAMBIKKAI_CLASSIFIER=block`,
+    post-calibration) demands a refusal — the caller exits 2. Warn tier and
+    every failure path return False (fail-open, never raises)."""
     if not classifier.enabled() or not high_risk(tool):
-        return
+        return False
     findings = classifier.classify(text)
     if findings is None:
         log_alert("CLASSIFIER-ERROR", tool, {"classifier"},
                   "call failed or no key — allowed (fail-open)")
-        return
+        return False
     if not findings:
-        return
+        return False
     kinds = {f["kind"] for f in findings}
     sample = classifier.mask_findings(text, findings)
-    log_alert("CLASSIFIER-WARN", tool, kinds, sample)
+    if classifier.block_mode() and not OVERRIDE:
+        log_alert("CLASSIFIER-BLOCK", tool, kinds, sample)
+        print(
+            f"⛔ Nambikkai classifier BLOCKED this {tool} call "
+            f"({'/'.join(sorted(kinds))} — NAMBIKKAI_CLASSIFIER=block). "
+            f"Use a pointer to your secrets store instead, or re-run with "
+            f"NAMBIKKAI_ALLOW_RAW=1 to override (logged). Masked view: {sample}",
+            file=sys.stderr,
+        )
+        return True
+    event = "CLASSIFIER-OVERRIDE" if (classifier.block_mode() and OVERRIDE) else "CLASSIFIER-WARN"
+    log_alert(event, tool, kinds, sample)
     print(
         f"⚠️ Nambikkai classifier flagged this {tool} call "
-        f"({'/'.join(sorted(kinds))}) — allowed (warn tier). Masked view: {sample}",
+        f"({'/'.join(sorted(kinds))}) — allowed "
+        f"({'override' if event == 'CLASSIFIER-OVERRIDE' else 'warn tier'}). "
+        f"Masked view: {sample}",
         file=sys.stderr,
     )
+    return False
 
 
 def log_alert(event, tool, kinds, masked_sample):
@@ -102,9 +118,11 @@ def main():
 
     findings = sweep(text)
     if not findings:
-        # regex sees nothing → the opt-in classifier tier gets one look
-        # at what regex can't see (names/money/addresses). Warn-only.
-        classifier_pass(tool, text)
+        # regex sees nothing → the opt-in classifier tier gets one look at
+        # what regex can't see (names/money/addresses). Warn tier by default;
+        # block mode (post-calibration) can refuse.
+        if classifier_pass(tool, text):
+            sys.exit(2)
         sys.exit(0)
 
     kinds = {f.kind for f in findings}

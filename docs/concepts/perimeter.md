@@ -66,9 +66,11 @@ When the deterministic sweep comes back clean on a high-risk tool (file writes, 
 egress — deliberately not Bash), a small LLM (Haiku) reads the payload for
 names/money/addresses. Properties, honestly stated:
 
-- **Warn-tier only.** Findings log + announce; nothing blocks. Promotion to a blocking
-  tier happens only after the live calibration test passes and you opt in — judge
-  before dispatch.
+- **Warn tier by default; block mode ships dark.** `NAMBIKKAI_CLASSIFIER=1` (or
+  `warn`) logs + announces, nothing blocks. `NAMBIKKAI_CLASSIFIER=block` promotes
+  findings to refusals (exit 2, `NAMBIKKAI_ALLOW_RAW` still the door) — flip it only
+  after the live calibration test is green. Judge before dispatch; an uncalibrated
+  blocker is a denial-of-service on your own work.
 - **Fail-open.** Missing key, timeout, malformed response → the call proceeds and a
   `CLASSIFIER-ERROR` line lands in the log. Your session never wedges on a cloud hiccup.
 - **The trade is explicit.** Enabling it sends tool-call text to the Anthropic API —

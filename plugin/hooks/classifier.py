@@ -52,7 +52,14 @@ Empty list if nothing matches. Be conservative: flag only clear cases."""
 
 
 def enabled() -> bool:
-    return os.environ.get("NAMBIKKAI_CLASSIFIER", "").lower() in {"1", "true", "yes"}
+    return os.environ.get("NAMBIKKAI_CLASSIFIER", "").lower() in {"1", "true", "yes", "warn", "block"}
+
+
+def block_mode() -> bool:
+    """`NAMBIKKAI_CLASSIFIER=block` promotes findings from warn to refusal.
+    Flip it ONLY after the live calibration test is green — an uncalibrated
+    blocker is a denial-of-service on your own work. Ships dark by default."""
+    return os.environ.get("NAMBIKKAI_CLASSIFIER", "").lower() == "block"
 
 
 def classify(text: str):
