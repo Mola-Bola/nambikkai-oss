@@ -9,6 +9,11 @@
 #   silently celebrated). Any port of the rules binds to this same file.
 # Part 2 — GATE: drives plugin/hooks/guard.py as a subprocess to prove
 #   block / warn / override behaviour on realistic tool payloads.
+# Part 3 — CLASSIFIER TIER: offline, proves the opt-in classifier fails OPEN
+#   (enabled + no API key → the call still goes through). With a live
+#   ANTHROPIC_API_KEY in the env, additionally runs the calibration: every
+#   known_gap case tagged classifier:"expected" must come back flagged, and
+#   no raw span may survive masking. Offline runs skip calibration and say so.
 #
 # At-rest rule applies HERE TOO: no matchable identifier may appear literally
 # in this file — synthetic tokens carry the '~~' splitter and are armed at
@@ -106,8 +111,50 @@ def gate():
         os.remove(tmplog)
 
 
+def classifier_tier():
+    tmplog = os.path.join(HERE, ".test-alerts.log")
+
+    # (a) fail-open, always: classifier ON but no key — a regex-clean write
+    # (a known_gap payload) must still be ALLOWED, never wedged.
+    with open(CASES) as f:
+        gaps = [c for c in json.load(f)["known_gap"] if c.get("classifier") == "expected"]
+    gap_payload = {
+        "tool_name": "Write",
+        "tool_input": {"file_path": "/tmp/x.md", "content": arm(gaps[0]["input"])},
+    }
+    rc, _ = run_gate(gap_payload, {
+        "NAMBIKKAI_LOG": tmplog, "NAMBIKKAI_CLASSIFIER": "1", "ANTHROPIC_API_KEY": "",
+    })
+    if rc != 0:
+        fails.append(f"classifier: enabled+keyless must fail OPEN (rc 0), got rc {rc}")
+
+    # (b) live calibration, only with a key: every expected case must flag.
+    if os.environ.get("ANTHROPIC_API_KEY", "").strip():
+        import classifier
+        os.environ["NAMBIKKAI_CLASSIFIER"] = "1"
+        for c in gaps:
+            armed = arm(c["input"])
+            found = classifier.classify(armed)
+            if found is None:
+                fails.append(f"classifier live {c['id']}: API call failed")
+            elif not found:
+                fails.append(f"classifier live {c['id']}: expected a flag, got none")
+            else:
+                masked = classifier.mask_findings(armed, found)
+                for f_ in found:
+                    if len(f_["text"]) > 3 and f_["text"] in masked:
+                        fails.append(f"classifier live {c['id']}: raw span survived masking")
+        print(f"classifier calibration: {len(gaps)} expected cases run live")
+    else:
+        print("classifier calibration: SKIPPED (no ANTHROPIC_API_KEY) — fail-open asserted only")
+
+    if os.path.exists(tmplog):
+        os.remove(tmplog)
+
+
 corpus()
 gate()
+classifier_tier()
 
 if fails:
     print(f"FAIL ({len(fails)})")

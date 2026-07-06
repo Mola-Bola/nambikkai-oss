@@ -26,6 +26,12 @@ them combine the three ingredients of the [lethal trifecta](https://simonwilliso
 private data, tool access, and untrusted content. Almost none of them ship a control
 for it beyond a promise in the prompt.
 
+Scope, stated plainly: Nambikkai defends **one edge of that trifecta — the egress
+edge**. It stops your private data leaking *out* through files, shells, and
+connectors. It does not yet inspect untrusted content coming *in* (the
+prompt-injection edge) — that's a roadmap line, not a shipped mechanism, and we'd
+rather tell you than let the framing imply it.
+
 Prompts are hopes. Nambikkai is mechanism:
 
 | Pillar | What it means | What enforces it |
@@ -47,7 +53,9 @@ It's honest by construction, in four groups:
 - `must_stay` — the guard must leave these alone
 - `known_overmatch` — shapes we over-trigger on (warn, never block — documented, asserted)
 - `known_gap` — what regex **cannot see** (free-text names, bare money amounts). Debt we
-  publish, not a hole we hide.
+  publish, not a hole we hide. An opt-in classifier tier (`NAMBIKKAI_CLASSIFIER=1`,
+  warn-only, fail-open) now covers these shapes — the corpus tags which cases are its
+  contract, and a live calibration test holds it to them.
 
 And one detail we're disproportionately proud of: every sensitive-shaped token in the
 corpus carries a `~~` splitter, so the corpus file itself never contains a matchable
@@ -69,18 +77,19 @@ gate.** (Our gate blocked our own test file during development. Working as inten
 
 ```
 nambikkai/
-├── plugin/            Claude Code plugin — hooks (gate + chat flag) + 2 skills
-├── corpus/            the golden corpus (synthetic, split at rest)
+├── plugin/            Claude Code plugin — hooks (gate + chat flag + opt-in classifier) + 2 skills
+├── mcp/               trust-gate MCP server — check / redact / tag_fact / lint, any MCP client
+├── corpus/            the golden corpus (synthetic, split at rest) — binds hooks AND server
 ├── conventions/       provenance receipts · trust doctrine · stage-only autonomy
-├── tests/             self-test: corpus drift-guard + gate behaviour
+├── tests/             self-tests: corpus drift-guard + gate + server-vs-corpus
 └── docs/              the full documentation
 ```
 
-Run the self-test any time:
+Run the self-tests any time:
 
 ```
-python3 tests/test_guard.py
-# nambikkai self-test: all green (corpus + gate)
+python3 tests/test_guard.py   # corpus + gate (+ classifier calibration when a key is present)
+python3 tests/test_mcp.py     # the MCP server against the same corpus
 ```
 
 ## Escape hatch, on the record
@@ -97,10 +106,14 @@ door; the door has a light over it.
 
 ## Roadmap
 
-- **v0.1** — Claude Code plugin (hooks + skills), corpus, conventions, docs ← you are here
-- **v0.2** — `trust-gate` MCP server: `check` / `redact` / `tag_fact` / `lint` for any MCP client
+- **v0.1** — Claude Code plugin (hooks + skills), corpus, conventions, docs
+- **v0.2** — `trust-gate` MCP server: `check` / `redact` / `tag_fact` / `lint` for any MCP client ← you are here
 - **v0.3** — npm + PyPI packages; the corpus ships as fixtures
-- **v0.x** — classifier pass for the `known_gap` class (free-text names); regional packs
+- **v0.x** — ~~classifier pass for the `known_gap` class~~ shipped as opt-in warn tier
+  (`NAMBIKKAI_CLASSIFIER=1`); blocking mode after calibration · regional packs
+- **v0.x** — **input perimeter** (the trifecta's other edge): untrusted-content
+  checks on tool *results* before they steer the agent. Explicitly not built yet —
+  design first, as a proposal
 
 ## License
 

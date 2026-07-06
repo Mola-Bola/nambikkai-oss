@@ -19,6 +19,12 @@ string value in `tool_input` is collected recursively and swept.
 | blocking kind + `NAMBIKKAI_ALLOW_RAW=1` | 0 | call proceeds; OVERRIDE logged + announced |
 | warn-only kind (`dob`, `brokerage`) | 0 | call proceeds; WARN logged |
 | unparseable stdin | 0 | fail-open — never wedge a session |
+| regex clean + classifier tier on + LLM finding | 0 | call proceeds; CLASSIFIER-WARN logged + announced |
+| regex clean + classifier tier on + API failure | 0 | call proceeds; CLASSIFIER-ERROR logged (fail-open) |
+
+The classifier rows apply only with `NAMBIKKAI_CLASSIFIER=1`, and only to high-risk
+tools (`Write`/`Edit`/`MultiEdit`/`NotebookEdit`/`mcp__*` — not Bash). See
+[The Perimeter](../concepts/perimeter.md) for the tier's full contract.
 
 **Guarantees:** stderr and the alert log carry masked snippets only — the guard never
 echoes a raw value. A logging failure never crashes the tool call.
@@ -49,3 +55,7 @@ Add `.nambikkai/` to your `.gitignore` — the log is local telemetry, not histo
 |---|---|---|
 | `NAMBIKKAI_ALLOW_RAW` | unset | `1`/`true`/`yes` downgrades blocks to logged warnings |
 | `NAMBIKKAI_LOG` | `./.nambikkai/alerts.log` | alert log path |
+| `NAMBIKKAI_CLASSIFIER` | unset | `1`/`true`/`yes` enables the opt-in LLM tier (needs `ANTHROPIC_API_KEY`) |
+| `NAMBIKKAI_CLASSIFIER_MODEL` | `claude-haiku-4-5-20251001` | model for the classifier pass |
+| `NAMBIKKAI_CLASSIFIER_TIMEOUT` | `8` | seconds before the pass fails open |
+| `NAMBIKKAI_CLASSIFIER_CAP` | `16000` | chars of payload classified (beyond the cap: unclassified, documented) |

@@ -36,6 +36,7 @@ nav:
       - The Gate: concepts/gate.md
   - Reference:
       - Hook contract: reference/hooks.md
+      - MCP server: reference/mcp.md
       - Corpus schema: reference/corpus.md
       - Rule pack & known gaps: reference/patterns.md
   - Recipes:

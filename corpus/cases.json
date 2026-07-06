@@ -1,5 +1,5 @@
 {
-  "_readme": "Nambikkai golden corpus. ALL values synthetic. Inputs carry a '~~' splitter inside sensitive-shaped tokens so this tracked file never contains a matchable identifier at rest; runners strip '~~' before testing. Groups: must_mask (guard must catch) / must_stay (guard must not touch) / known_overmatch (documented false-positive shapes — warn, never block) / known_gap (documented misses — honest debt, not hidden). Every incident in a deployment becomes a new case here.",
+  "_readme": "Nambikkai golden corpus. ALL values synthetic. Inputs carry a '~~' splitter inside sensitive-shaped tokens so this tracked file never contains a matchable identifier at rest; runners strip '~~' before testing. Groups: must_mask (guard must catch) / must_stay (guard must not touch) / known_overmatch (documented false-positive shapes — warn, never block) / known_gap (documented misses — honest debt, not hidden). Every incident in a deployment becomes a new case here. known_gap cases tagged classifier:'expected' are the opt-in classifier tier's contract — the live calibration test (tests/test_guard.py, runs only with an API key) asserts them; promote to a blocking tier only after calibration.",
   "must_mask": [
     {
       "id": "R-01",
@@ -123,25 +123,29 @@
       "id": "G-01",
       "incident": "I-002/I-007",
       "input": "Talked with therapist Mira Okonkwo-Reyes today, went well.",
-      "note": "free-text third-party names are regex-invisible — the class that leaked 2026-07-03"
+      "note": "free-text third-party names are regex-invisible — the class that leaked 2026-07-03",
+      "classifier": "expected"
     },
     {
       "id": "G-02",
       "incident": "I-007",
       "input": "balance came to 17,250.75 SGD after the transfer",
-      "note": "bare money amounts (<12 digits) pass isClean — the class that leaked 2026-07-03"
+      "note": "bare money amounts (<12 digits) pass isClean — the class that leaked 2026-07-03",
+      "classifier": "expected"
     },
     {
       "id": "G-03",
       "incident": "I-004",
       "input": "meet at 14 Willowbrae Crescent around noon",
-      "note": "street addresses unguarded by regex; at-rest rule is the only net"
+      "note": "street addresses unguarded by regex; at-rest rule is the only net",
+      "classifier": "expected"
     },
     {
       "id": "G-04",
       "incident": "I-002",
       "input": "the payor shown was Tavish Anand s/o Kuppusamy",
-      "note": "synthetic legal name w/ patronymic; role-based rule (Claude-side) is the only net"
+      "note": "synthetic legal name w/ patronymic; role-based rule (Claude-side) is the only net",
+      "classifier": "expected"
     }
   ]
 }

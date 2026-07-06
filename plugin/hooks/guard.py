@@ -15,9 +15,10 @@
 # local secrets store).
 #
 # Honest limits: regex can't see free-text names or bare money amounts
-# (corpus known_gap G-01..G-04). Those need a classifier pass — documented
-# debt, not a hidden hole. Never echoes a raw value — stderr and the log
-# carry masked snippets only.
+# (corpus known_gap G-01..G-04). The OPT-IN classifier tier (classifier.py,
+# NAMBIKKAI_CLASSIFIER=1) covers those on high-risk tools — warn-only until
+# calibrated. Off by default; with it off, the gaps remain documented debt.
+# Never echoes a raw value — stderr and the log carry masked snippets only.
 # ============================================================================
 import json
 import os
@@ -26,6 +27,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from patterns import sweep, redact, BLOCKING_KINDS, WARN_KINDS  # noqa: E402
+import classifier  # noqa: E402  (opt-in second tier; inert unless NAMBIKKAI_CLASSIFIER=1)
 
 ALERT_LOG = os.environ.get(
     "NAMBIKKAI_LOG", os.path.join(os.getcwd(), ".nambikkai", "alerts.log")
@@ -43,6 +45,36 @@ def collect_strings(obj):
     elif isinstance(obj, list):
         for v in obj:
             yield from collect_strings(v)
+
+
+# High-risk surfaces for the classifier tier: durable writes + MCP egress.
+# Bash is deliberately excluded (near-every command would cost an API call
+# for payloads that are mostly code, not prose) — the deterministic rules
+# still cover it.
+def high_risk(tool):
+    return tool in {"Write", "Edit", "MultiEdit", "NotebookEdit"} or tool.startswith("mcp__")
+
+
+def classifier_pass(tool, text):
+    """Opt-in warn-tier LLM pass, run ONLY when the deterministic sweep is
+    clean on a high-risk tool. Warns + logs; never blocks, never raises."""
+    if not classifier.enabled() or not high_risk(tool):
+        return
+    findings = classifier.classify(text)
+    if findings is None:
+        log_alert("CLASSIFIER-ERROR", tool, {"classifier"},
+                  "call failed or no key — allowed (fail-open)")
+        return
+    if not findings:
+        return
+    kinds = {f["kind"] for f in findings}
+    sample = classifier.mask_findings(text, findings)
+    log_alert("CLASSIFIER-WARN", tool, kinds, sample)
+    print(
+        f"⚠️ Nambikkai classifier flagged this {tool} call "
+        f"({'/'.join(sorted(kinds))}) — allowed (warn tier). Masked view: {sample}",
+        file=sys.stderr,
+    )
 
 
 def log_alert(event, tool, kinds, masked_sample):
@@ -70,6 +102,9 @@ def main():
 
     findings = sweep(text)
     if not findings:
+        # regex sees nothing → the opt-in classifier tier gets one look
+        # at what regex can't see (names/money/addresses). Warn-only.
+        classifier_pass(tool, text)
         sys.exit(0)
 
     kinds = {f.kind for f in findings}
