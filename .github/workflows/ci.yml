@@ -1,0 +1,63 @@
+name: nambikkai-ci
+
+# Two tiers, matching the guard's own design:
+#   - offline suite  — corpus + gate + MCP contracts. No key, no egress. Runs on
+#     every change, so a rule that breaks the golden corpus can't merge.
+#   - live calibration — the opt-in Haiku tier against the 4 known_gap blind spots
+#     (G-01..G-04). Costs 4 tiny API calls. Runs nightly as a MODEL-DRIFT ALARM:
+#     if a future Haiku silently goes blind to names/money/addresses, this goes red
+#     before a leaky blocker ever ships. Needs the ANTHROPIC_API_KEY repo secret.
+
+on:
+  push:
+    paths:
+      - 'plugin/**'
+      - 'corpus/**'
+      - 'mcp/**'
+      - 'tests/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+  schedule:
+    - cron: '0 15 * * *'   # nightly calibration drift check
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: offline suite (corpus + gate + mcp, no key)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: gate + golden corpus
+        run: python tests/test_guard.py
+      - name: mcp server vs corpus + tool contracts
+        run: python tests/test_mcp.py
+
+  calibration:
+    name: live calibration (Haiku drift alarm)
+    # only when there's a reason to spend API calls: the nightly schedule or a manual run
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: require the API key secret (no silent false-green)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY secret not set — calibration cannot run."
+            echo "Add it in repo Settings -> Secrets and variables -> Actions -> New repository secret."
+            exit 1
+          fi
+      - name: live calibration — all 4 classifier:expected cases must flag
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python tests/test_guard.py
