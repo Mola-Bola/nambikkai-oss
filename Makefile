@@ -27,6 +27,7 @@ test: .venv/.ok
 	python3 tests/test_mcp.py
 	.venv/bin/python tests/test_app.py
 	.venv/bin/python tests/test_vectors.py
+	.venv/bin/python tests/test_journey.py
 
 lint: .venv/.ok
 	.venv/bin/ruff check .

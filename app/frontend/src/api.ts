@@ -6,34 +6,77 @@
 // which is the entire point (FOUNDATIONS item 6).
 import type { components } from "./api-types";
 
-export type Entry = components["schemas"]["EntryOut"];
-export type ChainState = components["schemas"]["ChainState"];
-export type EntryDraft = components["schemas"]["EntryIn"];
-export type SaveResult = components["schemas"]["SaveOut"];
-export type EntriesResult = components["schemas"]["EntriesOut"];
+type S = components["schemas"];
+
+export type Entry = S["EntryOut"];
+export type Persona = S["PersonaOut"];
+export type Truth = S["TruthOut"];
+export type LooseEnd = S["LooseEndOut"];
+export type TimelineRow = S["TimelineRow"];
+export type ChainState = S["ChainState"];
+export type EntryDraft = S["EntryIn"];
+export type PersonaDraft = S["PersonaIn"];
+export type TruthDraft = S["TruthIn"];
+export type SaveResult = S["SaveOut"];
+export type EntriesResult = S["EntriesOut"];
+export type ThreadResult = S["ThreadOut"];
+export type YouResult = S["YouOut"];
+export type ImportResult = S["ImportOut"];
+export type HealthResult = S["HealthOut"];
 export type EntryKind = EntryDraft["kind"];
 
-async function readError(res: Response, fallback: string): Promise<string> {
-  const detail = (await res.json().catch(() => null))?.detail;
-  return typeof detail === "string" ? detail : fallback;
-}
-
-export async function saveEntry(draft: EntryDraft): Promise<SaveResult> {
-  const res = await fetch("/api/entries", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(draft),
+async function call<T>(url: string, init?: RequestInit, fallback = "Something didn't work."): Promise<T> {
+  const res = await fetch(url, {
+    ...init,
+    headers: init?.body ? { "Content-Type": "application/json", ...init?.headers } : init?.headers,
   });
   if (!res.ok) {
-    throw new Error(await readError(res, "Couldn't save. Is the app still running?"));
+    const detail = (await res.json().catch(() => null))?.detail;
+    throw new Error(typeof detail === "string" ? detail : fallback);
   }
   return res.json();
 }
 
-export async function listEntries(): Promise<EntriesResult> {
-  const res = await fetch("/api/entries");
-  if (!res.ok) {
-    throw new Error(await readError(res, "Couldn't load your journal."));
-  }
-  return res.json();
+const post = (body?: unknown): RequestInit => ({
+  method: "POST",
+  body: body === undefined ? undefined : JSON.stringify(body),
+});
+
+export const getHealth = () => call<HealthResult>("/api/health");
+
+export const listEntries = () =>
+  call<EntriesResult>("/api/entries", undefined, "Couldn't load your journal.");
+
+export const saveEntry = (draft: EntryDraft) =>
+  call<SaveResult>("/api/entries", post(draft), "Couldn't save. Is the app still running?");
+
+export const listPersonas = () => call<Persona[]>("/api/personas");
+
+export const createPersona = (p: PersonaDraft) => call<Persona>("/api/personas", post(p));
+
+export const updatePersona = (id: string, p: PersonaDraft) =>
+  call<Persona>(`/api/personas/${id}`, { method: "PUT", body: JSON.stringify(p) });
+
+export const getThread = (id: string) => call<ThreadResult>(`/api/personas/${id}/thread`);
+
+export const listTruths = () => call<Truth[]>("/api/truths");
+
+export const createTruth = (t: TruthDraft) => call<Truth>("/api/truths", post(t));
+
+export const listLooseEnds = () => call<LooseEnd[]>("/api/loose-ends");
+
+export const answerLooseEnd = (id: string, action: "added" | "dismissed") =>
+  call<LooseEnd[]>(`/api/loose-ends/${id}`, post({ action }));
+
+export const importText = (text: string) =>
+  call<ImportResult>("/api/import", post({ text }), "Couldn't read that.");
+
+export const getYou = () => call<YouResult>("/api/you");
+
+export const loadDemo = () => call<{ loaded: boolean }>("/api/demo/load", post());
+
+export const wipeDemo = () => call<{ removed: number }>("/api/demo/wipe", post());
+
+export async function exportBundle(): Promise<unknown> {
+  return call<unknown>("/api/export");
 }

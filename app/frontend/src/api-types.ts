@@ -39,6 +39,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/personas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Personas */
+        get: operations["list_personas_api_personas_get"];
+        put?: never;
+        /** Create Persona */
+        post: operations["create_persona_api_personas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/personas/{persona_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Persona */
+        put: operations["update_persona_api_personas__persona_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/personas/{persona_id}/thread": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read Thread */
+        get: operations["read_thread_api_personas__persona_id__thread_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/truths": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Truths */
+        get: operations["list_truths_api_truths_get"];
+        put?: never;
+        /** Create Truth */
+        post: operations["create_truth_api_truths_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/loose-ends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Loose Ends */
+        get: operations["list_loose_ends_api_loose_ends_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/loose-ends/{loose_end_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer Loose End */
+        post: operations["answer_loose_end_api_loose_ends__loose_end_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Text */
+        post: operations["import_text_api_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/you": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** You */
+        get: operations["you_api_you_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Everything
+         * @description The one door out. ADR 002's role-swap is applied here and nowhere else.
+         */
+        get: operations["export_everything_api_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/load": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Load Demo */
+        post: operations["load_demo_api_demo_load_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/wipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Wipe Demo */
+        post: operations["wipe_demo_api_demo_wipe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -90,6 +282,11 @@ export interface components {
              * @default
              */
             body: string;
+            /**
+             * Persona Ids
+             * @default []
+             */
+            persona_ids: string[];
             /** Privacy Choice */
             privacy_choice?: ("keep" | "blur") | null;
         };
@@ -135,6 +332,16 @@ export interface components {
              */
             blurred: boolean;
             /**
+             * Persona Ids
+             * @default []
+             */
+            persona_ids: string[];
+            /**
+             * Demo
+             * @default false
+             */
+            demo: boolean;
+            /**
              * Src
              * @default self
              */
@@ -160,6 +367,155 @@ export interface components {
             /** Ok */
             ok: boolean;
             chain: components["schemas"]["ChainState"];
+            /**
+             * Demo Loaded
+             * @default false
+             */
+            demo_loaded: boolean;
+        };
+        /** ImportIn */
+        ImportIn: {
+            /** Text */
+            text: string;
+        };
+        /** ImportOut */
+        ImportOut: {
+            /** Kept */
+            kept: number;
+            /** Undated */
+            undated: number;
+            /** Questions */
+            questions: components["schemas"]["LooseEndOut"][];
+        };
+        /** LooseEndIn */
+        LooseEndIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "added" | "dismissed";
+        };
+        /** LooseEndOut */
+        LooseEndOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Mentions
+             * @default 0
+             */
+            mentions: number;
+            /**
+             * At
+             * @default
+             */
+            at: string;
+            /**
+             * Source
+             * @default
+             */
+            source: string;
+            /**
+             * Demo
+             * @default false
+             */
+            demo: boolean;
+        };
+        /** OverviewOut */
+        OverviewOut: {
+            /** Entries Kept */
+            entries_kept: number;
+            /** People Mapped */
+            people_mapped: number;
+            /** Truths Revisited */
+            truths_revisited: number;
+            /** Returns After Quiet */
+            returns_after_quiet: number;
+            /** Days Written */
+            days_written: number;
+        };
+        /** PersonaIn */
+        PersonaIn: {
+            /** Name */
+            name: string;
+            /**
+             * Alias
+             * @default
+             */
+            alias: string;
+            /**
+             * Kind
+             * @default
+             */
+            kind: string;
+            /**
+             * Thought Then
+             * @default
+             */
+            thought_then: string;
+            /**
+             * Think Now
+             * @default
+             */
+            think_now: string;
+            /**
+             * Still Relevant
+             * @default true
+             */
+            still_relevant: boolean;
+        };
+        /** PersonaOut */
+        PersonaOut: {
+            /** Id */
+            id: string;
+            /**
+             * At
+             * @default
+             */
+            at: string;
+            /** Name */
+            name: string;
+            /**
+             * Alias
+             * @default
+             */
+            alias: string;
+            /**
+             * Kind
+             * @default
+             */
+            kind: string;
+            /**
+             * Thought Then
+             * @default
+             */
+            thought_then: string;
+            /**
+             * Think Now
+             * @default
+             */
+            think_now: string;
+            /**
+             * Still Relevant
+             * @default true
+             */
+            still_relevant: boolean;
+            /**
+             * Demo
+             * @default false
+             */
+            demo: boolean;
+            /**
+             * Mentions
+             * @default 0
+             */
+            mentions: number;
+            /**
+             * Last Line
+             * @default
+             */
+            last_line: string;
         };
         /** SaveOut */
         SaveOut: {
@@ -178,6 +534,96 @@ export interface components {
             entry?: components["schemas"]["EntryOut"] | null;
             chain?: components["schemas"]["ChainState"] | null;
         };
+        /** ThreadOut */
+        ThreadOut: {
+            persona: components["schemas"]["PersonaOut"];
+            /** Entries */
+            entries: components["schemas"]["EntryOut"][];
+            /** Truths */
+            truths: components["schemas"]["TruthOut"][];
+        };
+        /** TimelineRow */
+        TimelineRow: {
+            /** At */
+            at: string;
+            /** Kind */
+            kind: string;
+            /** Id */
+            id: string;
+            /**
+             * Headline
+             * @default
+             */
+            headline: string;
+            /**
+             * Feeling
+             * @default
+             */
+            feeling: string;
+            /**
+             * Demo
+             * @default false
+             */
+            demo: boolean;
+        };
+        /** TruthIn */
+        TruthIn: {
+            /**
+             * About
+             * @default self
+             */
+            about: string;
+            /** Text */
+            text: string;
+            /**
+             * Share Draft
+             * @default
+             */
+            share_draft: string;
+            /** Supersedes */
+            supersedes?: string | null;
+        };
+        /** TruthOut */
+        TruthOut: {
+            /** Id */
+            id: string;
+            /**
+             * About
+             * @default self
+             */
+            about: string;
+            /**
+             * About Name
+             * @default Yourself
+             */
+            about_name: string;
+            /** Text */
+            text: string;
+            /**
+             * Share Draft
+             * @default
+             */
+            share_draft: string;
+            /**
+             * Valid From
+             * @default
+             */
+            valid_from: string;
+            /** Valid To */
+            valid_to?: string | null;
+            /**
+             * Current
+             * @default true
+             */
+            current: boolean;
+            /** Supersedes */
+            supersedes?: string | null;
+            /**
+             * Demo
+             * @default false
+             */
+            demo: boolean;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -190,6 +636,23 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WipeOut */
+        WipeOut: {
+            /** Removed */
+            removed: number;
+        };
+        /** YouOut */
+        YouOut: {
+            overview: components["schemas"]["OverviewOut"];
+            /** Timeline */
+            timeline: components["schemas"]["TimelineRow"][];
+            /** Written Days */
+            written_days: string[];
+            /** Truth Days */
+            truth_days: string[];
+            /** Year Ago */
+            year_ago: components["schemas"]["EntryOut"][];
         };
     };
     responses: never;
@@ -280,6 +743,357 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_personas_api_personas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaOut"][];
+                };
+            };
+        };
+    };
+    create_persona_api_personas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_persona_api_personas__persona_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                persona_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_thread_api_personas__persona_id__thread_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                persona_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_truths_api_truths_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TruthOut"][];
+                };
+            };
+        };
+    };
+    create_truth_api_truths_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TruthIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TruthOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_loose_ends_api_loose_ends_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LooseEndOut"][];
+                };
+            };
+        };
+    };
+    answer_loose_end_api_loose_ends__loose_end_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                loose_end_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LooseEndIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LooseEndOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_text_api_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    you_api_you_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["YouOut"];
+                };
+            };
+        };
+    };
+    export_everything_api_export_get: {
+        parameters: {
+            query?: {
+                include_demo?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    load_demo_api_demo_load_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    wipe_demo_api_demo_wipe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WipeOut"];
                 };
             };
         };

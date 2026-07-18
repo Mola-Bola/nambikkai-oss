@@ -11,9 +11,33 @@ becomes engine-v2 with a documented migration — never an edit to v1.
 
 ## 1 · Storage model
 
-- One append-only file, `journal.jsonl`, one JSON object per line, UTF-8.
-- The file is the source of truth. Any SQLite views are derived and rebuildable.
+- Append-only files, one JSON object per line, UTF-8.
+- The files are the source of truth. Any SQLite views are derived and rebuildable.
 - Records are never edited or deleted in place. Correction is a new record.
+
+**Streams (added M3; the hash rule in §2 is unchanged).** Each kind of record
+gets its own chained file:
+
+| Stream | File | Genesis string |
+|---|---|---|
+| entries | `journal.jsonl` | `nambikkai:journal:v1` |
+| people & things | `personas.jsonl` | `nambikkai:personas:v1` |
+| truths | `truths.jsonl` | `nambikkai:truths:v1` |
+| loose ends | `loose-ends.jsonl` | `nambikkai:loose-ends:v1` |
+
+Genesis is per-stream so a record cannot be lifted out of one file, dropped into
+another and still verify. `journal` keeps the original genesis, so every chain
+written before M3 verifies untouched — the frozen vectors still pass unchanged.
+
+**Superseding, not editing.** A truth is never rewritten. Revising appends a new
+record carrying `supersedes: <old id>`; the old record keeps its text and its
+`valid_from` forever. A record's `valid_to` is therefore **computed** (it is the
+successor's `valid_from`), never stored. Same for personas: an edit appends a
+fresh record with the same `id`, and the reader takes the last one.
+
+**Wholesale rewrite** (`rewrite_stream`) exists for exactly one job: removing
+demo records. It rebuilds the file and re-seals every remaining record, so the
+chain stays valid rather than being left with a hole.
 
 ## 2 · The hash chain
 
@@ -67,8 +91,13 @@ reader, so later milestones can add fields without breaking old chains.
 | `feeling` `why` `cause` `helps` | guided fields (absent on free entries) |
 | `body` | free-write text (absent on guided entries) |
 | `blurred` | true if the user chose to mask identifiers before saving |
+| `persona_ids` | people/things the user tagged on this entry |
+| `demo` | true only for the synthetic demo set (M7); absent or false for real writing |
 | `src` `tier` `ttl` | provenance per conventions/provenance.md (`self`/`stated`/`permanent`) |
 | `prev` `hash` | chain fields, §2 |
+
+`src` is `self` for entries the user typed and `import` for entries read out of
+a file they brought in.
 
 ## 4 · Redaction rule pack
 
