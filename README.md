@@ -1,124 +1,106 @@
 # Nambikkai
 
-**Trust, with receipts.**
+**The journal that keeps receipts — and keeps them yours.**
 
-Your agents remember your life. Nambikkai is how you trust them with it — every fact
-carries provenance, every leak-shaped byte stops at the boundary, every failure becomes
-a permanent test.
+Nambikkai is an agentic journal. You tell it what you feel, what set it off, who it
+involves (by role, never by name), and what you believe about it. It keeps those
+beliefs the way an accountant keeps books: every entry carries provenance, every
+belief carries *valid-from* and *valid-to*, and nothing is ever silently rewritten.
+Over time it can show you where an ease or an unease actually stems from — "what I
+believed then" next to "what I know now" — and a gentle weekly reflection helps you
+unweave the tangles at your own pace.
 
-Not an OS. A component. Install it into the agent system you already run.
-
-```
-claude plugin marketplace add YOUR-GITHUB-USER/nambikkai
-claude plugin install nambikkai@nambikkai
-```
-
-Ninety seconds later, ask your agent to write a (synthetic) national ID to a file and
-watch the gate refuse.
+Not a chat app with memory. A ledger of personal truths, with an agent in service of it.
 
 ---
 
 ## Why this exists
 
-The agent-OS race is real — PAI, LifeOS, a dozen folder-of-markdown operating systems,
-each giving an AI persistent memory of your goals, money, health, and people. All of
-them combine the three ingredients of the [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/):
-private data, tool access, and untrusted content. Almost none of them ship a control
-for it beyond a promise in the prompt.
+Held truths compound like debt. A belief about a person, formed in one bad week and
+never revisited, quietly accrues interest for years — in how you read their messages,
+in what you don't say at dinner. Most journaling apps store *what happened*. None keep
+receipts on *what you believed*, or notice when the belief is stale.
 
-Scope, stated plainly: Nambikkai defends **one edge of that trifecta — the egress
-edge**. It stops your private data leaking *out* through files, shells, and
-connectors. It does not yet inspect untrusted content coming *in* (the
-prompt-injection edge) — that's a roadmap line, not a shipped mechanism, and we'd
-rather tell you than let the framing imply it.
+That's the whole product: **provenance for feelings.** Psychology calls the mechanism
+appraisal — emotions arise largely from what you believe about an event or a person,
+and revising the appraisal revises the feeling. A bitemporal belief ledger is
+reappraisal with receipts. The science on writing it down is real and honest-sized:
+naming a feeling precisely is itself regulating (affect labelling), and the effects of
+expressive writing roughly *double* when the writing gets feedback — which is exactly
+what the reflection loop is.
 
-Prompts are hopes. Nambikkai is mechanism:
+And one line we hold everywhere, in copy and in code: **Nambikkai is a journal, never
+therapy.** No diagnosis, no treatment language, anywhere. When the record looks heavy,
+it suggests distance, a walk, a human — warmly, and nothing more.
 
-| Pillar | What it means | What enforces it |
-|---|---|---|
-| **Receipts** | Every durable fact carries `[src \| date \| tier \| ttl]` — where it came from, when confirmed, how much to trust it, when to re-check | `provenance-lint` skill + the convention spec |
-| **Perimeter** | Identifier-shaped bytes are stopped *at the harness boundary* — file writes, shell args, MCP payloads — before they leave | `PreToolUse` gate hook (exit 2 blocks the call) |
-| **Drills** | Every incident becomes a corpus case the day it's resolved; the corpus replays on every test run | `incident-to-eval` skill + `tests/test_guard.py` |
-| **Gate** | Autonomy is granted through approval gates, never assumed — agents propose, humans approve, mechanically | `conventions/stage-only-autonomy.md` pattern |
+## Privacy is the first feature
 
-## The corpus is the point
+A journal holds the most personal data any agent system will ever touch. So the
+guarantees are architecture, not marketing:
 
-One golden corpus — [`corpus/cases.json`](corpus/cases.json) — binds every
-implementation. The Python hooks pass it. Any future port (TypeScript, Go, an MCP
-server) must pass the *same file* or it doesn't ship. Rules drift; the corpus doesn't.
+- **Local-first.** Entries live in a ledger on your machine. They never ride a commit,
+  a sync, or anyone's training run. There is no cloud copy to breach.
+- **People by role, never by name.** "The manager", "my spouse" — identity-class
+  values are not retained, mechanically (a vault-side roles map plus a redaction net
+  over every stored field).
+- **Hash-chained entries.** Each row chains to the last. Yesterday's entry can't be
+  quietly rewritten — by you at 2am, by a bug, or by anything else. Receipts are real.
+- **The reflection loop proposes, never acts.** Stage-only autonomy, inherited from
+  the trust layer this journal is built on.
 
-It's honest by construction, in four groups:
+## The engine room (where the trust layer went)
 
-- `must_mask` — the guard must catch these
-- `must_stay` — the guard must leave these alone
-- `known_overmatch` — shapes we over-trigger on (warn, never block — documented, asserted)
-- `known_gap` — what regex **cannot see** (free-text names, bare money amounts). Debt we
-  publish, not a hole we hide. An opt-in classifier tier (`NAMBIKKAI_CLASSIFIER=1`,
-  warn-only, fail-open) now covers these shapes — the corpus tags which cases are its
-  contract, and a live calibration test holds it to them.
+Nambikkai began as the extracted trust layer of a production personal life-OS — a
+redaction gate, a provenance convention, a golden corpus, an MCP server. That layer
+wasn't shelved; it became the journal's invisible core:
 
-And one detail we're disproportionately proud of: every sensitive-shaped token in the
-corpus carries a `~~` splitter, so the corpus file itself never contains a matchable
-identifier at rest. The test suite arms them at runtime. **The corpus passes its own
-gate.** (Our gate blocked our own test file during development. Working as intended.)
+| Was (the trust layer) | Is (the journal) |
+|---|---|
+| Bitemporal receipts `[src \| date \| tier \| ttl]` | Entry & belief provenance — "believed then / known now" |
+| Redaction gate + classifier (the perimeter) | The privacy spine: people-by-role, identity non-retention |
+| The golden corpus + `incident-to-eval` flywheel | The honesty discipline — every guard provably tested, every gap published |
+| Stage-only autonomy convention | The reflection loop's leash — it suggests, you decide |
 
-## What Nambikkai is not
+The developer-facing pieces still exist and still pass their suites (`plugin/`,
+`mcp/`, `corpus/`, `conventions/` — run `python3 tests/test_guard.py` and
+`tests/test_mcp.py` any time). The dev-tool *positioning* retires; the mechanism is
+now judged by what it protects.
 
-- **Not an OS.** It's one cog, built to compose into a system of systems — yours.
-- **Not a PII detection library.** [Presidio](https://github.com/microsoft/presidio)
-  and [llm-guard](https://github.com/protectai/llm-guard) detect well as libraries an
-  app must remember to call. Nambikkai's bet is *placement*: enforcement wired into the
-  agent harness itself, where forgetting isn't possible.
-- **Not finished.** v0.1 ships an SG/AU-flavored identifier pack (NRIC/FIN, AU mobile,
-  passports, account numbers, DOBs, brokerage refs). Regional packs land as corpus PRs
-  — a rule without cases doesn't merge.
+## Status
+
+Local web-app MVP (charter 2026-07-17): a FastAPI backend wrapping the engine, a
+React front, everything on localhost. The builder is user #1; the product generalises
+from what demonstrably works on a real life, not a persona.
+
+- **Capture** — a `journal:` message routes to the chained truth ledger (shipped)
+- **Reflection loop** — weekly, gentle-suggestive, self-distancing by design; drafts
+  reviewed by the owner before a single message sends (in build)
+- **Habit tracker** — gamified for *returning after a gap*, not streak-guilt; built
+  for bad weeks, because those are the weeks the product exists for (after the journal
+  loop earns daily use)
+- **Grounding** — calibration only against licensed research corpora (ISEAR,
+  Covid-ED, GoEmotions, EmpatheticDialogues) behind a binding ethics gate: no scraped
+  blogs, nothing regurgitated, and user entries never leave the local spine for
+  training
 
 ## What's in the box
 
 ```
 nambikkai/
-├── plugin/            Claude Code plugin — hooks (gate + chat flag + opt-in classifier) + 2 skills
-├── mcp/               trust-gate MCP server — check / redact / tag_fact / lint, any MCP client
-├── corpus/            the golden corpus (synthetic, split at rest) — binds hooks AND server
+├── plugin/            Claude Code plugin — the redaction gate + provenance skills (the perimeter)
+├── mcp/               trust-gate MCP server — check / redact / tag_fact / lint
+├── corpus/            the golden corpus (synthetic, split at rest) — binds every implementation
 ├── conventions/       provenance receipts · trust doctrine · stage-only autonomy
+├── research/          the science, market, law, and data-ethics grounding
 ├── tests/             self-tests: corpus drift-guard + gate + server-vs-corpus
 └── docs/              the full documentation
 ```
 
-Run the self-tests any time:
-
-```
-python3 tests/test_guard.py   # corpus + gate (+ classifier calibration when a key is present)
-python3 tests/test_mcp.py     # the MCP server against the same corpus
-```
-
-## Escape hatch, on the record
-
-Sometimes you *mean* to write a real value into your local secrets store:
-
-```
-NAMBIKKAI_ALLOW_RAW=1
-```
-
-downgrades the next block to a logged warning. Every block, warn, and override lands in
-`.nambikkai/alerts.log` as a masked snippet — never the raw value. The perimeter has a
-door; the door has a light over it.
-
-## Roadmap
-
-- **v0.1** — Claude Code plugin (hooks + skills), corpus, conventions, docs
-- **v0.2** — `trust-gate` MCP server: `check` / `redact` / `tag_fact` / `lint` for any MCP client ← you are here
-- **v0.3** — npm + PyPI packages; the corpus ships as fixtures
-- **v0.x** — ~~classifier pass for the `known_gap` class~~ shipped as opt-in warn tier
-  (`NAMBIKKAI_CLASSIFIER=1`); blocking mode after calibration · regional packs
-- **v0.x** — **input perimeter** (the trifecta's other edge): untrusted-content
-  checks on tool *results* before they steer the agent. Explicitly not built yet —
-  design first, as a proposal
-
 ## License
 
-[MIT](LICENSE) © The Nambikkai authors
+[MIT](LICENSE) © [publisher TBD]
 
 ---
 
-*நம்பிக்கை (nambikkai) — Tamil: trust, faith, hope.*
+*நம்பிக்கை (nambikkai) — Tamil: trust, faith, hope. It used to name a guardrail for
+developers. It now names what a journal has to earn from a person.*
