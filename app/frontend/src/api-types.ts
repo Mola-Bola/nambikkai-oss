@@ -300,6 +300,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/demo/diaries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Diaries
+         * @description Converted diaries on disk. Empty until someone runs `make demo-diary`.
+         */
+        get: operations["list_diaries_api_demo_diaries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/demo/diaries/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Load Diary
+         * @description Load a real diary as DEMO data. Same rules as the invented set.
+         */
+        post: operations["load_diary_api_demo_diaries__name__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/demo/wipe": {
         parameters: {
             query?: never;
@@ -329,6 +369,56 @@ export interface components {
             count: number;
             /** Broken At */
             broken_at?: number | null;
+        };
+        /** DiaryLoadOut */
+        DiaryLoadOut: {
+            /** Loaded */
+            loaded: boolean;
+            /**
+             * Reason
+             * @default
+             */
+            reason: string;
+            /**
+             * Set
+             * @default
+             */
+            set: string;
+            /**
+             * Entries
+             * @default 0
+             */
+            entries: number;
+            /**
+             * Questions
+             * @default 0
+             */
+            questions: number;
+            /**
+             * Candidates Found
+             * @default 0
+             */
+            candidates_found: number;
+        };
+        /**
+         * DiaryOut
+         * @description A converted public-domain diary sitting on disk, ready to load.
+         */
+        DiaryOut: {
+            /** Name */
+            name: string;
+            /** Title */
+            title: string;
+            /** Author */
+            author: string;
+            /** Source */
+            source: string;
+            /** Entries */
+            entries: number;
+            /** First */
+            first: string;
+            /** Last */
+            last: string;
         };
         /** EntriesOut */
         EntriesOut: {
@@ -463,6 +553,11 @@ export interface components {
              * @default false
              */
             demo_loaded: boolean;
+            /**
+             * Demo Set
+             * @default
+             */
+            demo_set: string;
             /**
              * Guide Seen
              * @default false
@@ -1375,6 +1470,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_diaries_api_demo_diaries_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiaryOut"][];
+                };
+            };
+        };
+    };
+    load_diary_api_demo_diaries__name__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiaryLoadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

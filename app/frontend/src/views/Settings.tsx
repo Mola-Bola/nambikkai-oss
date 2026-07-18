@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { ReflectionSettings, exportBundle, loadDemo, setQuestionsOn, wipeDemo } from "../api";
+import { useEffect, useState } from "react";
+import {
+  Diary,
+  ReflectionSettings,
+  exportBundle,
+  listDiaries,
+  loadDemo,
+  loadDiary,
+  setQuestionsOn,
+  wipeDemo,
+} from "../api";
 
 const PROMISES = [
   "Your words stay on this device. There is no cloud copy to breach.",
@@ -21,6 +30,15 @@ export default function Settings({
 }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [diaries, setDiaries] = useState<Diary[]>([]);
+
+  // Absent unless someone ran `make demo-diary`, so the card only appears for
+  // whoever built it. Nothing is downloaded and nothing is auto-prepared.
+  useEffect(() => {
+    listDiaries()
+      .then(setDiaries)
+      .catch(() => setDiaries([]));
+  }, []);
 
   async function withBusy(what: string, fn: () => Promise<string>) {
     setBusy(what);
@@ -150,6 +168,45 @@ export default function Settings({
           )}
         </div>
       </section>
+
+      {diaries.length > 0 && (
+        <section className="card">
+          <strong>Try it with a real diary</strong>
+          <p className="whisper">
+            A published diary from more than a century ago, in the public domain, loaded the
+            same way your own old journals would be. It is here to show the app holding a
+            whole life rather than a week of it. Still demo data: labelled, and one button
+            removes it.
+          </p>
+          {diaries.map((d) => (
+            <div className="diary" key={d.name}>
+              <div>
+                <b>{d.title}</b>
+                <small>
+                  {d.author} · {d.entries} entries · {d.first.slice(0, 4)} to{" "}
+                  {d.last.slice(0, 4)} · {d.source}
+                </small>
+              </div>
+              <button
+                className="ghost"
+                disabled={busy !== null}
+                onClick={() =>
+                  withBusy("diary", async () => {
+                    const r = await loadDiary(d.name);
+                    return (
+                      `Loaded ${r.entries} entries, all labelled demo. ` +
+                      `It found ${r.candidates_found} repeated names and is asking about ` +
+                      `${r.questions} of them.`
+                    );
+                  })
+                }
+              >
+                {busy === "diary" ? "Loading…" : "Load this diary"}
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
 
       {note && <p className="toast">{note}</p>}
     </>

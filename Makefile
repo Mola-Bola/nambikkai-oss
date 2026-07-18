@@ -29,6 +29,7 @@ test: .venv/.ok
 	.venv/bin/python tests/test_vectors.py
 	.venv/bin/python tests/test_journey.py
 	.venv/bin/python tests/test_reflection.py
+	.venv/bin/python tests/test_diary.py
 
 # The local embedding model (ADR 003). One explicit step, checksummed, run once.
 # The app works without it: matching falls back to shared words until it lands.

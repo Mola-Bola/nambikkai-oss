@@ -182,9 +182,33 @@ class HealthOut(BaseModel):
     ok: bool
     chain: ChainState
     demo_loaded: bool = False
+    # Which demo set, so the banner can name it. Two exist and only one is ever
+    # loaded at a time; "this is made up" needs to say made up of what.
+    demo_set: str = ""
     # Whether the orientation has been shown. App state, like demo_loaded, and
     # it rides along here so the first screen needs no extra round trip.
     guide_seen: bool = False
+
+
+class DiaryOut(BaseModel):
+    """A converted public-domain diary sitting on disk, ready to load."""
+
+    name: str
+    title: str
+    author: str
+    source: str
+    entries: int
+    first: str
+    last: str
+
+
+class DiaryLoadOut(BaseModel):
+    loaded: bool
+    reason: str = ""
+    set: str = ""
+    entries: int = 0
+    questions: int = 0
+    candidates_found: int = 0
 
 
 class GuideOut(BaseModel):
@@ -333,6 +357,7 @@ def health():
         ok=True,
         chain=_chain_state(),
         demo_loaded=store.has_demo(),
+        demo_set=store.demo_set(),
         guide_seen=store.settings()["guide_seen"],
     )
 
@@ -681,6 +706,25 @@ def load_demo():
     result = demo_data.load()
     _resync_index()
     return result
+
+
+@app.get("/api/demo/diaries", response_model=list[DiaryOut])
+def list_diaries():
+    """Converted diaries on disk. Empty until someone runs `make demo-diary`."""
+    return [
+        DiaryOut(**{k: v for k, v in d.items() if k in DiaryOut.model_fields})
+        for d in demo_data.diaries()
+    ]
+
+
+@app.post("/api/demo/diaries/{name}", response_model=DiaryLoadOut)
+def load_diary(name: str):
+    """Load a real diary as DEMO data. Same rules as the invented set."""
+    if not any(d["name"] == name for d in demo_data.diaries()):
+        raise HTTPException(404, "That diary hasn't been prepared yet. Run: make demo-diary")
+    result = demo_data.load_diary(name)
+    _resync_index()
+    return DiaryLoadOut(**result)
 
 
 @app.post("/api/demo/wipe", response_model=WipeOut)

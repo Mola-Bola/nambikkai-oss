@@ -46,6 +46,7 @@ export default function App() {
   const [you, setYou] = useState<YouResult | null>(null);
   const [chain, setChain] = useState<ChainState | null>(null);
   const [demoLoaded, setDemoLoaded] = useState(false);
+  const [demoSet, setDemoSet] = useState("");
   const [reflection, setReflection] = useState<ReflectionSettings | null>(null);
   const [guideSeen, setGuideSeen] = useState(true); // assume seen until told otherwise
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function App() {
       setLooseEnds(l);
       setYou(y);
       setDemoLoaded(h.demo_loaded ?? false);
+      setDemoSet(h.demo_set ?? "");
       setGuideSeen(h.guide_seen ?? true);
       setReflection(r);
       setError(null);
@@ -110,8 +112,9 @@ export default function App() {
       <main className="main">
         {demoLoaded && (
           <div className="demo-banner">
-            Demo data is loaded. Anything marked <span className="badge demo">demo</span> is
-            made up, not yours. Remove it any time in Settings.
+            Demo data is loaded{demoSet ? `: ${demoSet}` : ""}. Anything marked{" "}
+            <span className="badge demo">demo</span> is not yours. Remove it any time in
+            Settings.
           </div>
         )}
         {error && <p className="error">{error}</p>}

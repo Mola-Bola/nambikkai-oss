@@ -913,3 +913,28 @@ dd {
   font-size: 14px;
   line-height: 1.5;
 }
+
+/* --- the real-diary demo card --- */
+
+.diary {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 12px 0 2px;
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+}
+
+.diary b {
+  display: block;
+  font-weight: 600;
+}
+
+.diary small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

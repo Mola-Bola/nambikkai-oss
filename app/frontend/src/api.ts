@@ -27,6 +27,8 @@ export type EntryKind = EntryDraft["kind"];
 export type RelatedResult = S["RelatedOut"];
 export type RelatedEntry = S["RelatedEntry"];
 export type ReflectionSettings = S["ReflectionSettings"];
+export type Diary = S["DiaryOut"];
+export type DiaryLoadResult = S["DiaryLoadOut"];
 
 async function call<T>(url: string, init?: RequestInit, fallback = "Something didn't work."): Promise<T> {
   const res = await fetch(url, {
@@ -79,6 +81,13 @@ export const getYou = () => call<YouResult>("/api/you");
 export const loadDemo = () => call<{ loaded: boolean }>("/api/demo/load", post());
 
 export const wipeDemo = () => call<{ removed: number }>("/api/demo/wipe", post());
+
+// The optional real-diary demo set. Empty until `make demo-diary` has been run,
+// because the source text is gitignored and converted at build time.
+export const listDiaries = () => call<Diary[]>("/api/demo/diaries");
+
+export const loadDiary = (name: string) =>
+  call<DiaryLoadResult>(`/api/demo/diaries/${name}`, post());
 
 // --- reflection (ADR 003) ---------------------------------------------------
 // These return the user's own records and a score. There is no endpoint here

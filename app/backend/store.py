@@ -414,6 +414,20 @@ def wipe_demo() -> dict:
     return {"removed": removed}
 
 
+def demo_set() -> str:
+    """Which demo set is loaded, in words fit for a banner. Empty if none.
+
+    Two sets exist (an invented life, and a real public-domain diary) and only
+    one is ever loaded at a time. The screen has to be able to say WHICH, or
+    "this is made up" stops being a precise claim.
+    """
+    for stream in ledger.all_streams():
+        for row in ledger.read_stream(stream):
+            if row.get(DEMO_TAG) and row.get("demo_set"):
+                return row["demo_set"]
+    return ""
+
+
 def has_demo() -> bool:
     return any(
         any(r.get(DEMO_TAG) for r in ledger.read_stream(stream))
