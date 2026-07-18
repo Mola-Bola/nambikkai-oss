@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nambikkai — mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEDE6; --card:#FDFCF8; --ink:#26312E; --muted:#6E7A74;
+    --teal:#135D66; --teal-soft:#E3EDEA; --gold:#D99A2B; --rose:#A85D67; --sage:#7C9885;
+    --line:#DDD8CB; --shadow:0 1px 3px rgba(38,49,46,.08);
+    --serif:'Newsreader',Georgia,serif; --disp:'Fraunces',Georgia,serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55}
+  button{font-family:inherit;cursor:pointer}
+  .app{display:flex;min-height:100vh}
+  /* rail */
+  .rail{width:196px;padding:28px 18px;border-right:1px solid var(--line);flex-shrink:0}
+  .brand{font-family:var(--disp);font-weight:600;font-size:22px;letter-spacing:.2px;margin-bottom:4px}
+  .brand small{display:block;font-family:var(--serif);font-weight:400;font-size:12.5px;color:var(--muted);letter-spacing:0}
+  .rail nav{margin-top:28px;display:flex;flex-direction:column;gap:2px}
+  .rail button{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 12px;border-radius:8px;font-size:15.5px;color:var(--ink)}
+  .rail button:hover{background:#E7E4D9}
+  .rail button.on{background:var(--teal);color:#F6F3EA}
+  .rail .foot{margin-top:44px;font-size:12.5px;color:var(--muted);line-height:1.5;padding:0 12px}
+  /* main */
+  .main{flex:1;padding:36px 48px;max-width:820px}
+  .screen{display:none}.screen.on{display:block}
+  h1{font-family:var(--disp);font-weight:500;font-size:30px;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:15.5px;margin-bottom:26px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+  label{display:block;font-size:15.5px;font-weight:500;margin-bottom:2px}
+  .hint{font-size:13px;color:var(--muted);margin-bottom:7px}
+  textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;background:#FFFFFF;padding:10px 12px;font-family:var(--serif);font-size:16px;color:var(--ink);resize:vertical}
+  textarea:focus,input:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
+  .q{margin-bottom:18px}
+  .btn{background:var(--teal);color:#F6F3EA;border:0;border-radius:8px;padding:10px 20px;font-size:15.5px}
+  .btn.ghost{background:none;color:var(--teal);border:1px solid var(--teal)}
+  .btn.quiet{background:none;color:var(--muted);border:0;font-size:14px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .spread{display:flex;justify-content:space-between;align-items:baseline}
+  /* mood */
+  .mood{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:340px}
+  .mood button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:14px 10px;font-size:14.5px;color:var(--ink)}
+  .mood button.on{border-color:var(--teal);background:var(--teal-soft)}
+  .words{margin-top:10px;display:none;flex-wrap:wrap;gap:6px}
+  .words.show{display:flex}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 13px;font-size:14px}
+  .chip.on{background:var(--gold);border-color:var(--gold);color:#fff}
+  .chip.cal{border-style:dashed;color:var(--teal)}
+  /* entries */
+  .entry{border-left:3px solid var(--sage);padding-left:16px;margin-bottom:22px}
+  .entry.rough{border-left-color:var(--rose)}
+  .entry .when{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px}
+  .entry p{font-size:16px;margin-bottom:4px}
+  .entry .tags{font-size:13px;color:var(--teal)}
+  /* pixels */
+  .pixels{display:grid;grid-template-columns:repeat(31,11px);gap:3px;margin:10px 0 6px}
+  .px{width:11px;height:11px;border-radius:3px;background:#E4E1D5}
+  .px.s1{background:#CBD8CD}.px.s2{background:var(--sage)}.px.s3{background:#4E7A5F}
+  .px.r1{background:#E7D3D5}.px.r2{background:var(--rose)}
+  .px.g{background:var(--gold)}
+  .pxlab{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  /* personas */
+  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .persona{position:relative;overflow:hidden;padding-top:24px}
+  .persona .blob{position:absolute;top:-34px;right:-30px;width:120px;height:120px;border-radius:46% 54% 58% 42%/48% 42% 58% 52%;opacity:.16}
+  .persona .mono{width:46px;height:46px;border-radius:42% 58% 52% 48%/55% 45% 55% 45%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:21px;color:#F6F3EA;margin-bottom:10px}
+  .persona h3{font-family:var(--disp);font-weight:500;font-size:21px}
+  .persona .kind{font-size:13.5px;color:var(--muted)}
+  .persona .present{font-size:15px;margin-top:8px}
+  .persona .last{margin-top:10px;font-size:13.5px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;font-style:italic}
+  .persona details{margin-top:12px}
+  .persona summary{font-size:13.5px;color:var(--teal);cursor:pointer;list-style:none}
+  .persona summary::after{content:" →"}
+  .thennow{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;font-size:14.5px}
+  .thennow b{font-weight:500;color:var(--muted);font-size:12.5px;display:block}
+  .rel{margin-top:10px;font-size:13px;color:var(--muted)}
+  /* truths thread */
+  .truth{position:relative;padding-left:26px}
+  .truth::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;border-left:2px dotted var(--gold)}
+  .knot{position:relative;margin-bottom:16px}
+  .knot::before{content:"";position:absolute;left:-23px;top:6px;width:9px;height:9px;border-radius:99px;background:var(--gold)}
+  .knot.past::before{background:#D9CEB2}
+  .knot .when{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .knot p{font-size:16px}
+  .knot .strike{color:var(--muted)}
+  .share{background:var(--teal-soft);border-radius:8px;padding:10px 14px;font-size:14.5px;margin-top:8px}
+  .share b{font-weight:500;font-size:12.5px;color:var(--teal);display:block}
+  /* import */
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:38px;text-align:center;color:var(--muted);background:#FBFAF4}
+  .digest .card{border-left:3px solid var(--gold)}
+  /* popup */
+  .pop{position:fixed;right:26px;bottom:26px;width:320px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(38,49,46,.18);padding:18px;display:none}
+  .pop.show{display:block}
+  .pop b{font-family:var(--disp);font-weight:500;font-size:16px}
+  .pop p{font-size:14.5px;margin:6px 0 12px}
+  /* you */
+  .stat{display:flex;gap:26px;flex-wrap:wrap}
+  .stat div b{font-family:var(--disp);font-size:26px;font-weight:500;display:block}
+  .stat div span{font-size:13px;color:var(--muted)}
+  svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+  .integ{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .integ .card{margin:0}
+  .integ .tag{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:30px;background:var(--ink);color:#F6F3EA;border-radius:99px;padding:10px 22px;font-size:14.5px;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .promise{font-size:14px;color:var(--muted)}
+  .promise li{margin:8px 0 8px 18px}
+  @media(max-width:760px){.rail{width:64px}.rail .brand small,.rail nav button span,.rail .foot{display:none}.main{padding:22px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">Nambikkai<small>a journal that keeps receipts</small></div>
+    <nav id="nav">
+      <button data-s="today" class="on">Today</button>
+      <button data-s="journal">Journal</button>
+      <button data-s="people">People &amp; things</button>
+      <button data-s="truths">Truths</button>
+      <button data-s="bring">Bring in</button>
+      <button data-s="you">You</button>
+      <button data-s="settings">Settings</button>
+    </nav>
+    <div class="foot">Your words never leave this device.</div>
+  </aside>
+
+  <main class="main">
+
+  <!-- TODAY -->
+  <section class="screen on" id="s-today">
+    <h1>Friday 18 July</h1>
+    <p class="sub">Write it how it comes. Mess is fine.</p>
+    <div class="card">
+      <textarea id="t-main" rows="6" placeholder="This page is yours."></textarea>
+      <div class="row" style="margin:12px 0 4px">
+        <span style="font-size:14px;color:var(--muted)">If it helps, pull in a piece of your day:</span>
+        <button class="chip cal" onclick="insertChip(this,'Morning run, 7:30am')">Morning run, 7:30am</button>
+        <button class="chip cal" onclick="insertChip(this,'Call with Priya')">Call with Priya</button>
+        <button class="chip cal" onclick="insertChip(this,'Farmers market, closing time')">Farmers market, closing time</button>
+      </div>
+      <div class="q" style="margin-top:14px"><label style="font-weight:400;color:var(--muted);font-size:14.5px">A feeling word, if one comes</label>
+        <input type="text" id="t-feel" placeholder="your word, any word" oninput="suggestWords(this.value)" style="max-width:340px">
+        <div class="words show" id="words"></div>
+        <div class="hint" style="margin-top:6px">Suggestions, not a menu. Yours wins.</div>
+      </div>
+      <div id="guided"></div>
+      <div class="row spread" style="margin-top:12px">
+        <button class="btn quiet" id="guideBtn" onclick="guideMe()">Ask me something</button>
+        <button class="btn" onclick="saveEntry()">Keep this</button>
+      </div>
+    </div>
+    <div class="card" id="afterSave" style="display:none;border-left:3px solid var(--sage)">
+      <b style="font-family:var(--disp);font-weight:500">Kept. One small question, only if you want it</b>
+      <p style="font-size:15px;margin:8px 0" id="afterQ"></p>
+      <div class="row"><button class="btn ghost" onclick="toast('Noted, in your words.');$('afterSave').style.display='none'">Answer</button>
+      <button class="btn quiet" onclick="$('afterSave').style.display='none'">Not now</button></div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="screen" id="s-journal">
+    <h1>Journal</h1>
+    <p class="sub">Your days, kept. Quiet days are just quiet, not missing.</p>
+    <div class="card">
+      <div class="spread"><label>July</label><span class="pxlab">each square is a day</span></div>
+      <div class="pixels" id="pixels"></div>
+      <span class="pxlab">green: easier days · rose: harder days · gold: a truth was revisited</span>
+    </div>
+    <div class="card">
+      <div class="hint" style="margin-bottom:12px">One year ago this week</div>
+      <div class="entry"><div class="when">2025-07-16 · the old city</div>
+        <p>Last box packed. The flat echoes. Sam laughed at how I kept the camera bag out of the boxes like it was a passport.</p>
+        <div class="tags">Sam · the flat</div>
+      </div>
+    </div>
+    <div id="entries"></div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section class="screen" id="s-people">
+    <h1>People &amp; things</h1>
+    <p class="sub">Everyone and everything that shapes your days. Named your way.</p>
+    <div class="pgrid" id="personas"></div>
+  </section>
+
+  <!-- TRUTHS -->
+  <section class="screen" id="s-truths">
+    <h1>Truths</h1>
+    <p class="sub">What you have come to believe. Kept with dates, so it can change when you do.</p>
+    <div class="card">
+      <div class="spread"><h3 style="font-family:var(--disp);font-weight:500;font-size:19px">The manager</h3>
+        <button class="btn ghost" style="padding:6px 14px;font-size:13.5px" onclick="reviseTruth()">Still true?</button></div>
+      <div class="truth" style="margin-top:14px" id="truth1">
+        <div class="knot past"><div class="when">believed from 2024-03 to 2025-11</div>
+          <p class="strike">He cut me out of that project because he wanted me gone.</p></div>
+        <div class="knot"><div class="when">what you know now · since 2025-11</div>
+          <p>He was shielding the team from a reorg he could not talk about. I read silence as malice.</p></div>
+      </div>
+      <div class="share"><b>Kept aside, in case you ever want to say it</b>
+        I judged you for two years for a thing you were protecting us from. If we ever sit down again, the coffee is on me.</div>
+    </div>
+    <div class="card">
+      <div class="spread"><h3 style="font-family:var(--disp);font-weight:500;font-size:19px">Yourself</h3></div>
+      <div class="truth" style="margin-top:14px">
+        <div class="knot"><div class="when">believed since 2026-06</div>
+          <p>I do my best thinking near water. The desk is where I record it, not where it happens.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRING IN -->
+  <section class="screen" id="s-bring">
+    <h1>Bring in what you already wrote</h1>
+    <p class="sub">Old journals, notes, exports. Nambikkai reads them and starts your map. Nothing is deleted, nothing leaves this device.</p>
+    <div class="drop card">Drop files here, or click to choose<br><span style="font-size:13px">Day One, Daylio, plain text, Word, whatever you have</span></div>
+    <div class="digest">
+      <div class="hint" style="margin:18px 0 10px">From your last import, 3 questions when you are ready. Never a quiz, never a gate.</div>
+      <div class="card"><b style="font-family:var(--disp);font-weight:500">Does this sound right to you?</b>
+        <p style="margin:8px 0">These entries from March read like a hard stretch, twelve days in a row. Want them kept together as one chapter?</p>
+        <div class="row"><button class="btn ghost" onclick="toast('Kept as a chapter.')">Yes, keep together</button>
+        <button class="btn quiet" onclick="toast('Left as they are.')">Leave as is</button></div>
+      </div>
+      <div class="card"><b style="font-family:var(--disp);font-weight:500">Someone new</b>
+        <p style="margin:8px 0">You mention "Ravi" in four entries from 2024. Someone you would like on your map?</p>
+        <div class="row"><button class="btn ghost" onclick="toast('Ravi added to People.')">Add Ravi</button>
+        <button class="btn quiet" onclick="toast('Okay, not asking again.')">Not now</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- YOU -->
+  <section class="screen" id="s-you">
+    <h1>You</h1>
+    <p class="sub">The bigger picture, from your own words. Nambikkai offers, you decide.</p>
+    <div class="card">
+      <div class="stat">
+        <div><b>214</b><span>entries kept</span></div>
+        <div><b>9</b><span>people &amp; things mapped</span></div>
+        <div><b>3</b><span>truths revisited</span></div>
+        <div><b>4</b><span>returns after a quiet spell</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <label>The thread of your year</label>
+      <div class="hint">Easier and harder stretches, in your own words' tone. A question, not a verdict.</div>
+      <svg viewBox="0 0 640 120" width="100%" height="120">
+        <line x1="0" y1="60" x2="640" y2="60" stroke="#DDD8CB" stroke-dasharray="3 4"/>
+        <polyline fill="none" stroke="#135D66" stroke-width="2.5"
+          points="0,64 60,58 120,70 180,88 240,92 300,74 360,60 420,52 480,58 540,40 600,44 640,38"/>
+        <circle cx="240" cy="92" r="4" fill="#A85D67"/><circle cx="540" cy="40" r="4" fill="#D99A2B"/>
+        <text x="212" y="110">a rough stretch in March</text>
+        <text x="500" y="28">manager truth revised</text>
+        <text x="4" y="16">Aug 25</text><text x="600" y="16">Jul 26</text>
+      </svg>
+    </div>
+    <div class="card">
+      <label>Morning walk</label>
+      <div class="hint">Strength grows with return, not with guilt. Three a week is the promise.</div>
+      <svg viewBox="0 0 640 80" width="100%" height="80">
+        <polyline fill="none" stroke="#7C9885" stroke-width="2.5"
+          points="0,70 80,58 160,48 240,44 320,58 400,52 480,40 560,34 640,30"/>
+        <text x="300" y="76">the gap in May barely shows. you came back, it kept counting</text>
+      </svg>
+    </div>
+    <div class="card">
+      <label>Alongside your words</label>
+      <div class="hint">Apps you already use can add their piece, if you choose. Off until you say so.</div>
+      <div class="integ" style="margin-top:10px">
+        <div class="card"><b>Strava</b><p class="tag">runs &amp; rides · not connected</p></div>
+        <div class="card"><b>AllTrails</b><p class="tag">hikes · not connected</p></div>
+        <div class="card"><b>Apple Health</b><p class="tag">sleep &amp; steps · not connected</p></div>
+        <div class="card"><b>Screen time</b><p class="tag">phone use · not connected</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="screen" id="s-settings">
+    <h1>Settings</h1>
+    <p class="sub">Short list, strong promises.</p>
+    <div class="card"><label>Our promises</label>
+      <ul class="promise">
+        <li>Your words stay on this device. There is no cloud copy to breach.</li>
+        <li>Nothing you write is ever used to train anything.</li>
+        <li>Export everything, any time, in plain files. No paywall on your own life.</li>
+        <li>Yesterday's entry cannot be silently rewritten. Changes are kept as changes.</li>
+        <li>No streaks that reset to zero. Coming back is the win here.</li>
+        <li>Nambikkai never tells you what you feel. It asks.</li>
+      </ul>
+    </div>
+    <div class="card"><label>Lock</label><div class="hint">Face ID / passcode before the journal opens.</div>
+      <button class="btn ghost">Turn on</button></div>
+    <div class="card"><label>Names</label>
+      <div class="hint">Use real names or nicknames here on your device. If anything ever leaves (like an export you share), names become roles first and you review it.</div></div>
+  </section>
+
+  </main>
+</div>
+
+<!-- loose end popup -->
+<div class="pop" id="pop">
+  <b>A loose end, when you are ready</b>
+  <p>You wrote about "the lake" three times this month, always on better days. Add it to People &amp; things?</p>
+  <div class="row">
+    <button class="btn" style="padding:7px 14px;font-size:13.5px" onclick="closePop(true)">Add it</button>
+    <button class="btn quiet" onclick="closePop(false)">Later</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+/* nav */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$('s-'+b.dataset.s).classList.add('on');
+});
+/* feeling words: type-ahead over a wide vocabulary, never a fixed menu */
+const VOCAB=['glad','proud','excited','hopeful','grateful','light','free','tense','frustrated','anxious','overwhelmed','irritated','wound up','calm','content','safe','soft','at ease','settled','tired','sad','lonely','flat','resentful','heavy','homesick','torn','relieved','curious','numb','warm','seen','small','steady'];
+let moodWord=null;
+function suggestWords(v){
+  const w=$('words');w.innerHTML='';moodWord=v||null;
+  const pool=v?VOCAB.filter(x=>x.startsWith(v.toLowerCase())&&x!==v.toLowerCase()).slice(0,5)
+             :['glad','tense','calm','tired','homesick'];
+  pool.forEach(word=>{const c=document.createElement('button');c.className='chip';c.textContent=word;
+    c.onclick=()=>{$('t-feel').value=word;moodWord=word;w.innerHTML='';};w.appendChild(c);});
+}
+suggestWords('');
+/* guided: one gentle question at a time, only when asked for */
+const GUIDE=[
+ {q:'Who or what is part of this?',h:'People, pets, places, things. Name them your way.'},
+ {q:'Why today, do you think?',h:'A guess is enough.'},
+ {q:'Anything you want to remember about this?',h:'For the you who reads this later.'}];
+let gi=0;
+function guideMe(){
+  if(gi>=GUIDE.length){$('guideBtn').style.display='none';return;}
+  const g=GUIDE[gi++];const d=document.createElement('div');d.className='q';
+  d.innerHTML=`<label style="font-weight:400;font-size:15px">${g.q}</label><div class="hint">${g.h}</div><textarea rows="2"></textarea>`;
+  $('guided').appendChild(d);d.querySelector('textarea').focus();
+  if(gi>=GUIDE.length)$('guideBtn').style.display='none';
+}
+function insertChip(btn,txt){$('t-main').value=($('t-main').value+' '+txt).trim();btn.disabled=true;btn.style.opacity=.45;}
+/* entries */
+/* All people, pets and places below are fictional demo characters. */
+const DEMO=[
+ {when:'2026-07-17 · evening',rough:false,body:'The lake again after work. Cold enough to empty the head. Came out grinning. Whatever the week takes, the water gives back.',tags:'the lake'},
+ {when:'2026-07-15 · late',rough:true,body:'Snapped at Sam over nothing, the boxes again. It is not the boxes. It is that the new place still does not smell like ours.',tags:'Sam · the move'},
+ {when:'2026-07-12',rough:false,body:'Priya called. She asked about the garden like I have one. Maybe that is her way of saying put down roots.',tags:'Priya'}
+];
+function renderEntries(){$('entries').innerHTML=DEMO.map(e=>
+ `<div class="card"><div class="entry ${e.rough?'rough':''}"><div class="when">${e.when}</div><p>${e.body}</p><div class="tags">${e.tags}</div></div></div>`).join('');}
+const HEAVY=['tense','frustrated','anxious','overwhelmed','irritated','wound up','tired','sad','lonely','flat','resentful','heavy','homesick','numb','small','torn'];
+function saveEntry(){
+  const body=$('t-main').value||'(no words yet, and that is fine)';
+  const extra=[...document.querySelectorAll('#guided textarea')].map(t=>t.value).filter(Boolean).join(' · ');
+  DEMO.unshift({when:'2026-07-18 · just now',rough:HEAVY.includes(moodWord),body:body+(extra?' · '+extra:''),tags:(moodWord?'feeling: '+moodWord:'unsorted')});
+  renderEntries();toast('Kept. Your words stay here.');
+  $('t-main').value='';$('t-feel').value='';$('guided').innerHTML='';gi=0;$('guideBtn').style.display='';
+  /* contextual, optional follow-up: never part of the form, never assumes an issue */
+  $('afterQ').textContent = HEAVY.includes(moodWord)
+    ? 'That reads like a rough one. Has anything helped with days like this before?'
+    : moodWord ? 'A good one to keep. What made it possible?'
+    : 'Sounds like Priya might be part of this. Keep it on her thread?';
+  $('afterSave').style.display='block';moodWord=null;suggestWords('');
+}
+/* pixels */
+const PX=['','s1','s2','s1','','s2','s3','s1','r1','r2','r1','','s1','s2','s1','g','s2','s1','','','s1','s2','s3','s2','s1','','r1','s1','s2','s3','g'];
+$('pixels').innerHTML=PX.map(c=>`<div class="px ${c}"></div>`).join('');
+/* personas */
+/* Fictional demo characters throughout. */
+const P=[
+ {n:'Priya',k:'mother · calls Sundays',present:'The garden questions are her way of asking if you are putting down roots.',
+  last:'"She asked about the garden like I have one." · 12 Jul',
+  then:'Always worried, always calling at the wrong time.',now:'Her worry is how she says she misses me.',rel:'in your pages 31 times, mostly on warm days',c:'#7C9885'},
+ {n:'Sam',k:'partner · here, every day',present:'The move sits between you some evenings. The laughing is louder than the boxes.',
+  last:'"It is that the new place still does not smell like ours." · 15 Jul',
+  then:'',now:'',rel:'in your pages 58 times, through everything',c:'#135D66'},
+ {n:'Mochi',k:'cat · couch owner',present:'Ruined the couch. Made it home.',
+  last:'"Slept on the laundry again, no shame at all." · 9 Jul',
+  then:'The reason the couch is ruined.',now:'The reason the couch is home.',rel:'daily, uncomplicated',c:'#D99A2B'},
+ {n:'The lake',k:'place · your thinking room',present:'Three mentions this month. All of them better days.',
+  last:'"Whatever the week takes, the water gives back." · 17 Jul',
+  then:'A hobby.',now:'Where the thinking happens.',rel:'weekly, kept sacred',c:'#4E7A8A'}
+];
+$('personas').innerHTML=P.map(p=>`<div class="card persona">
+ <div class="blob" style="background:${p.c}"></div>
+ <div class="mono" style="background:${p.c}">${p.n[0]}</div>
+ <h3>${p.n}</h3><span class="kind">${p.k}</span>
+ <div class="present">${p.present}</div>
+ <div class="last">${p.last}</div>
+ ${p.then?`<details><summary>How your view has moved</summary>
+   <div class="thennow"><b>you thought, then</b>${p.then}<b style="margin-top:8px">you think, now</b>${p.now}</div></details>`:''}
+ <div class="rel">${p.rel}</div></div>`).join('');
+/* truths */
+function reviseTruth(){toast('Asking never rewrites. A new line is added, the old one keeps its dates.');}
+/* popup + toast */
+function closePop(add){$('pop').classList.remove('show');if(add)toast('The lake joined your map.');}
+setTimeout(()=>$('pop').classList.add('show'),1400);
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+renderEntries();
+</script>
+</body>
+</html>

@@ -78,6 +78,12 @@ surface where users see themselves whole.
 - **Habits, holistically:** good habits compound; log manually AND (opt-in, reasonable) fetch
   natively — screen time, sleep, etc. from phone systems — when the user says they want to cut
   down or build up. One holistic view.
+- **Habit-app integrations (owner, 2026-07-18):** lean on the apps people already use rather
+  than rebuilding them — Strava for running, AllTrails for hikes, and whatever else is commonly
+  used per activity (survey per habit type before building). Imported activities compound with
+  the user's own notes and habits where they fit, so a bigger picture forms. Opt-in per source,
+  source-agnostic schema, manual entry always the fallback (see docs/commodity-map.md: Health
+  Auto Export REST push, ActivityWatch local API — same pattern, more sources).
 - **Basic-needs reflection:** sleep · diet · exercise · relationships · comfort (Maslow-ish fit
   TBD) — show where a user may be lacking and what they might do.
 - **Good-news feed:** objectively good news only — restoration-of-faith good, not
