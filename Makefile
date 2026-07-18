@@ -40,6 +40,13 @@ model:
 index: .venv/.ok
 	.venv/bin/python app/backend/index.py --rebuild
 
+# Convert a public-domain diary into an import file, for the optional real-life
+# demo set. Reads corpus-data/ (gitignored) and writes build/ (gitignored), so
+# the diary text never enters version control at either end. Stdlib only, so it
+# runs on the system interpreter without the venv.
+demo-diary:
+	python3 ops/convert-diary.py
+
 lint: .venv/.ok
 	.venv/bin/ruff check .
 
@@ -59,4 +66,4 @@ api-types: .venv/.ok app/frontend/node_modules
 backup:
 	bash ops/backup.sh
 
-.PHONY: dev test lint fmt hooks backup api-types model index
+.PHONY: dev test lint fmt hooks backup api-types model index demo-diary

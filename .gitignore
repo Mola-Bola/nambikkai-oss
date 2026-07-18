@@ -23,3 +23,6 @@ corpus-data/**
 
 # the local embedding model: fetched by `make model`, never committed
 /models/
+
+# converted demo diaries: built from gitignored corpus-data, never committed
+/build/
