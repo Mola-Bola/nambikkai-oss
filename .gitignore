@@ -20,3 +20,6 @@ corpus-data/**
 !corpus-data/**/
 !corpus-data/**/*.md
 !corpus-data/ACQUISITION-LOG.md
+
+# the local embedding model: fetched by `make model`, never committed
+/models/

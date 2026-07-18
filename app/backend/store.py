@@ -14,6 +14,8 @@
 #    here scores, predicts or labels a mood. Import proposes questions; the user
 #    answers. Counting is allowed; concluding is not.
 # ============================================================================
+import json
+import os
 import re
 import uuid
 from datetime import UTC, datetime
@@ -30,6 +32,47 @@ def _now() -> str:
 
 def new_id() -> str:
     return uuid.uuid4().hex
+
+
+# --- preferences ------------------------------------------------------------
+# Deliberately NOT in the ledger. The chained streams are a record of a life;
+# whether a toggle is on is a setting, and mixing the two would put "changed a
+# checkbox" in the same history as "changed my mind about my mother".
+
+SETTINGS_FILE = "settings.json"
+
+DEFAULT_SETTINGS = {
+    # ADR 003: the gentle-question layer is off until the user turns it on.
+    "questions_on": False,
+    # The usage guide shows once, before the first entry, and never nags after.
+    "guide_seen": False,
+}
+
+
+def _settings_path() -> str:
+    return os.path.join(ledger.data_dir(), SETTINGS_FILE)
+
+
+def settings() -> dict:
+    path = _settings_path()
+    if not os.path.exists(path):
+        return dict(DEFAULT_SETTINGS)
+    try:
+        with open(path, encoding="utf-8") as f:
+            saved = json.load(f)
+    except (OSError, ValueError):
+        # An unreadable settings file must not brick the app, and the safe
+        # reading of a broken preference file is always the default: off.
+        return dict(DEFAULT_SETTINGS)
+    return {**DEFAULT_SETTINGS, **{k: saved[k] for k in DEFAULT_SETTINGS if k in saved}}
+
+
+def save_settings(changes: dict) -> dict:
+    merged = {**settings(), **{k: v for k, v in changes.items() if k in DEFAULT_SETTINGS}}
+    os.makedirs(ledger.data_dir(), exist_ok=True)
+    with open(_settings_path(), "w", encoding="utf-8") as f:
+        json.dump(merged, f, indent=2)
+    return merged
 
 
 # --- entries ----------------------------------------------------------------

@@ -28,6 +28,17 @@ test: .venv/.ok
 	.venv/bin/python tests/test_app.py
 	.venv/bin/python tests/test_vectors.py
 	.venv/bin/python tests/test_journey.py
+	.venv/bin/python tests/test_reflection.py
+
+# The local embedding model (ADR 003). One explicit step, checksummed, run once.
+# The app works without it: matching falls back to shared words until it lands.
+model:
+	bash ops/fetch-model.sh
+
+# Rebuild the relevance index from the ledger. The index is a derived view, so
+# this is always safe -- and it is the fix for anything that looks wrong there.
+index: .venv/.ok
+	.venv/bin/python app/backend/index.py --rebuild
 
 lint: .venv/.ok
 	.venv/bin/ruff check .
@@ -48,4 +59,4 @@ api-types: .venv/.ok app/frontend/node_modules
 backup:
 	bash ops/backup.sh
 
-.PHONY: dev test lint fmt hooks backup api-types
+.PHONY: dev test lint fmt hooks backup api-types model index

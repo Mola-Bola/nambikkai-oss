@@ -1,0 +1,76 @@
+{
+  "note": [
+    "Relevance fixtures for the reflection loop (ADR 003). Every entry below is",
+    "INVENTED. No real person, no corpus text, nothing from anyone's journal.",
+    "They are written at the length people actually write at, because short",
+    "fragments score differently and calibrating on them produces a floor that",
+    "is wrong in the app. That mistake was made once already and caught here.",
+    "",
+    "THE POINT OF THIS FILE IS THAT THE MATCHER'S LIMITS ARE PUBLISHED. A",
+    "matcher whose failures are named can be reasoned about; one that quietly",
+    "degrades cannot. known_gap and known_overmatch are asserted in",
+    "tests/test_reflection.py exactly like the passing cases, so if a gap ever",
+    "closes or a new overmatch ever appears, the suite says so out loud.",
+    "",
+    "Scores are computed over EVERY pair of entries here, not a chosen few.",
+    "Sampling flattered the matcher badly on the first pass: hand-picked",
+    "unrelated pairs topped out at 0.150 while the true worst case across all",
+    "120 pairs was 0.334, which was higher than two of the four real matches."
+  ],
+
+  "entries": {
+    "sleep-a": "Couldn't sleep again last night. Lay there turning the same three things over until the light came, then got up and made coffee like nothing happened.",
+    "sleep-b": "Another one of those nights staring at the ceiling until nearly three. I know the pattern by now. Knowing it does not seem to help much.",
+    "work-a": "Work has been relentless this month. Every time I clear the queue another one lands and I am starting to resent the sound of the laptop opening.",
+    "work-b": "The workload is crushing at the moment. I finished at nine again and could not remember what I had eaten, or whether I had.",
+    "mum-a": "Mum called and we ended up arguing about the move again. She does not say she is worried, she says the flat is too far from a hospital.",
+    "mum-b": "Another round with my mother about relocating. Same script, same ending. I put the phone down and stood in the kitchen for a while.",
+    "water-a": "Went down to the lake after work. Cold enough to empty the head completely. Came out grinning at nothing in particular.",
+    "water-b": "Swam at the reservoir this evening. Twenty minutes in the water and the week came off me like a coat.",
+    "tax-a": "Finally submitted the tax return after putting it off for six weeks. It took forty minutes. Six weeks of dread for forty minutes of typing.",
+    "cat-a": "Mochi knocked the plant off the shelf again and then sat in the soil looking genuinely offended that I was annoyed.",
+    "car-a": "Need to renew the car insurance before Friday. Also the bins, also the dentist. Writing it down so it stops rattling around.",
+    "cook-a": "Made a decent curry for the first time without following the recipe exactly. Small thing but I have been pleased about it all evening.",
+    "talk-a": "The presentation went badly and I felt about two feet tall walking back to my desk afterwards.",
+    "talk-b": "The presentation went well this time. Someone asked a real question at the end and I actually knew the answer.",
+    "thin-a": "Today was fine. Not much to say.",
+    "thin-b": "An ordinary day. Nothing much happened."
+  },
+
+  "related_pairs": [
+    ["sleep-a", "sleep-b", "the same sleepless night, described with almost no shared words"],
+    ["work-a", "work-b", "the same overwork, different vocabulary"],
+    ["mum-a", "mum-b", "the same recurring argument, 'mum' against 'my mother'"],
+    ["water-a", "water-b", "the same thing water does for this person, lake against reservoir"]
+  ],
+
+  "must_surface": [
+    ["mum-a", "mum-b", "minilm-v1"],
+    ["water-a", "water-b", "minilm-v1"]
+  ],
+
+  "must_stay_silent": [
+    ["sleep-a", "tax-a"],
+    ["work-a", "cat-a"],
+    ["mum-a", "cook-a"],
+    ["water-a", "car-a"],
+    ["cook-a", "car-a"],
+    ["mum-b", "water-a"],
+    ["sleep-a", "water-a"],
+    ["work-b", "cook-a"]
+  ],
+
+  "known_gap": [
+    ["sleep-a", "sleep-b", "minilm-v1", "scores 0.32, inside the band where unrelated pairs reach 0.33. Caught only by a floor low enough to admit noise, so it is given up deliberately. Precision first."],
+    ["work-a", "work-b", "minilm-v1", "scores 0.29, same problem. 'Relentless' and 'crushing' are close enough for a person and not for this model."],
+    ["sleep-a", "sleep-b", "lexical-v1", "no shared content words at all, so word overlap cannot see it"],
+    ["work-a", "work-b", "lexical-v1", "'relentless' against 'crushing' is invisible to word overlap"],
+    ["mum-a", "mum-b", "lexical-v1", "'mum' and 'my mother' are different strings"],
+    ["water-a", "water-b", "lexical-v1", "'lake' and 'reservoir' are different strings"]
+  ],
+
+  "known_overmatch": [
+    ["talk-a", "talk-b", "minilm-v1", "the same event with opposite outcomes reads as one topic, and scores 0.45. Showing these two side by side is arguably the product working, since the user sees their own two takes and draws the conclusion. But the matcher cannot tell the difference and must not be credited with doing so."],
+    ["thin-a", "thin-b", "minilm-v1", "two entries with almost no content match on emptiness at 0.50. Handled by the MIN_CONTENT_WORDS gate rather than by the score, which is why this pair must produce nothing despite scoring higher than every real match here."]
+  ]
+}

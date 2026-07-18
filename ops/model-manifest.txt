@@ -1,0 +1,30 @@
+# The one model Nambikkai will run, pinned.
+#
+# ADR 003: the model is NEVER fetched at runtime. ops/fetch-model.sh reads this
+# file, downloads exactly these files at exactly this revision, and refuses to
+# install anything whose sha256 does not match. Nothing else may write to
+# models/, and no code path in app/ downloads anything at all.
+#
+# all-MiniLM-L6-v2 is Apache-2.0, published for reuse, and runs here through
+# ONNX Runtime: no torch, no server, no network at inference. It clears the
+# ethics gate (licensed and explicitly published) and nothing a user writes
+# ever goes into it or back to it.
+#
+# WHY THIS ONE. Smaller static models were tried first and measured against
+# tests/fixtures/relevance.json. potion-base-8M could not separate related
+# entries from unrelated ones at any threshold (gap -0.052); potion-retrieval
+# -32M barely could (+0.012); this model separates them by +0.135 at about 3ms
+# an entry. See the header of app/backend/embed.py for the full comparison.
+#
+# To change models: edit this file, run `make model`, then `make index` to
+# rebuild the vectors, then re-derive the floors in app/backend/index.py from
+# the fixtures. Vectors from two different models are not comparable.
+
+repo      sentence-transformers/all-MiniLM-L6-v2
+revision  1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+licence   Apache-2.0
+
+# model.onnx is published under onnx/ in the repo but installed flat here.
+sha256  953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41  config.json         config.json
+sha256  be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037  tokenizer.json      tokenizer.json
+sha256  6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452  model.onnx          onnx/model.onnx

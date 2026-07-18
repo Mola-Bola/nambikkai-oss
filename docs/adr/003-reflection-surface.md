@@ -77,13 +77,24 @@ Relevance is computed on-device with a small local embedding model plus sqlite-v
 ## Consequences
 
 - Two embedding backends exist behind one interface: a deterministic **lexical** backend
-  (pure standard library, no download, always available) and a **static-embedding**
-  backend used once `make model` has run. Vectors from the two are not interchangeable,
-  so the index records which backend and dimension wrote it and rebuilds on a mismatch
-  rather than silently mixing two spaces.
+  (pure standard library, no download, always available) and **all-MiniLM-L6-v2 run
+  locally through ONNX Runtime**, used once `make model` has run. Vectors from the two
+  are not interchangeable, so the index records which backend and dimension wrote it and
+  rebuilds on a mismatch rather than silently mixing two spaces.
 - Relevance fixtures are published in the repo and asserted in the test battery, with
   the known gaps and known overmatches named rather than hidden. A matcher that quietly
   degrades is worse than one with documented limits.
+- **The matcher is tuned for precision, and the recall cost is accepted.** Measured over
+  every pair in the fixtures, about half of what a person would call related scores
+  inside the same band as unrelated writing, and no threshold separates them. The floor
+  is therefore set where nothing false gets through, which means real connections are
+  missed. That is the right way round: a missed connection costs nothing, since the user
+  still has their journal, while a false one puts two unrelated pieces of someone's life
+  side by side and implies they belong together. Silence beats a bad guess.
+- Smaller static embedding models were tried first and rejected on measurement, not
+  taste: they could not separate two accounts of the same night from two entries that
+  merely shared a ruminative tone. The comparison is recorded in `app/backend/embed.py`
+  and reproducible from the fixtures.
 - `make model` is documented and optional. CI and the default test run must pass without
   it, which keeps the offline promise honest and testable.
 - The mood-graph question (STATUS, "two deliberate departures") is closed by point 1:

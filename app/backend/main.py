@@ -27,7 +27,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, os.path.join(ROOT, "plugin", "hooks"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import demo as demo_data  # noqa: E402
+import embed  # noqa: E402
 import importer  # noqa: E402
+import index as relevance  # noqa: E402
 import ledger  # noqa: E402
 import security  # noqa: E402
 import store  # noqa: E402
@@ -219,7 +221,65 @@ class WipeOut(BaseModel):
     removed: int
 
 
+class RelatedEntry(BaseModel):
+    """A past entry offered beside the one in front of you.
+
+    `entry` is the user's own record, verbatim from the ledger. There is no
+    field here for a summary, a theme, a label or a reason, and there must
+    never be one: ADR 003 puts the user's words on screen or nothing.
+    """
+
+    entry: EntryOut
+    score: float
+
+
+class RelatedOut(BaseModel):
+    related: list[RelatedEntry] = []
+    # "shared words only" tells the UI to say matching is basic until the local
+    # model is installed. It is never dressed up as anything cleverer.
+    matching: Literal["meaning", "shared words only"] = "shared words only"
+
+
+class ReflectionSettings(BaseModel):
+    """Everything the reflection loop is allowed to do, and its default answer.
+
+    questions_on is FALSE by default and only the user may change it (ADR 003).
+    """
+
+    questions_on: bool = False
+    matching: Literal["meaning", "shared words only"] = "shared words only"
+    model_present: bool = False
+    indexed: int = 0
+
+
 # --- helpers ----------------------------------------------------------------
+
+
+def _index_quietly(entry: dict) -> None:
+    """Index a new entry, and never let that failure reach the user.
+
+    The index is a derived view (ADR 003). Losing it costs a related-entries
+    link until the next `make index`; it must never cost someone their writing,
+    so nothing this raises is allowed to escape a successful save.
+    """
+    try:
+        relevance.add(entry)
+    except Exception as exc:  # noqa: BLE001 - deliberately swallowing everything
+        print(f"index: skipped an entry ({exc})", file=sys.stderr)
+
+
+def _resync_index() -> None:
+    """Rebuild the index after something rewrote the ledger wholesale.
+
+    Loading or wiping demo data adds and removes entries in bulk, so an
+    incremental pass would leave the index pointing at records that no longer
+    exist. A full rebuild from the ledger is the cheap, always-correct answer,
+    and it is exactly what the index is designed to survive.
+    """
+    try:
+        relevance.backfill(rebuild=True)
+    except Exception as exc:  # noqa: BLE001 - a derived view must never break a request
+        print(f"index: rebuild skipped ({exc})", file=sys.stderr)
 
 
 def _chain_state() -> ChainState:
@@ -307,6 +367,7 @@ def create_entry(e: EntryIn):
         "ttl": "permanent",
     }
     rec = store.add_entry(record)
+    _index_quietly(rec)
     return SaveOut(saved=True, entry=_entry_out(rec), chain=_chain_state())
 
 
@@ -438,7 +499,7 @@ def import_text(payload: ImportIn):
         # The privacy net still applies to imported words, but importing must
         # never stall on a question: identifiers are masked, and the entry says so.
         found = {f.kind for f in sweep(body)} & BLOCKING_KINDS
-        store.add_entry(
+        imported = store.add_entry(
             {
                 "id": store.new_id(),
                 "at": block["at"] or _now(),
@@ -456,6 +517,8 @@ def import_text(payload: ImportIn):
                 "ttl": "permanent",
             }
         )
+        # Imported years are exactly what the juxtaposition surface is for.
+        _index_quietly(imported)
 
     known = {p.get("name", "").lower() for p in store.personas()}
     for candidate in result["candidates"]:
@@ -494,6 +557,65 @@ def you():
     )
 
 
+# --- reflection (R2-R4, ADR 003) --------------------------------------------
+# The whole loop is here, and it is deliberately thin. It finds ids and hands
+# back the user's own records. There is no code path in this section that
+# writes a sentence about anyone's inner life, because there is no such thing
+# to write: the surface shows their words or it shows nothing.
+
+
+def _matching_kind() -> str:
+    """What the UI is allowed to claim about how matching works right now.
+
+    Without the local model this is honest word overlap, and the screen says so
+    rather than implying an understanding the app does not have.
+    """
+    return "meaning" if embed.active_backend() == embed.STATIC else "shared words only"
+
+
+@app.get("/api/reflection/settings", response_model=ReflectionSettings)
+def reflection_settings():
+    saved = store.settings()
+    state = relevance.status()
+    return ReflectionSettings(
+        questions_on=saved["questions_on"],
+        matching=_matching_kind(),
+        model_present=state["model_present"],
+        indexed=state["indexed"],
+    )
+
+
+class ReflectionSettingsIn(BaseModel):
+    questions_on: bool
+
+
+@app.put("/api/reflection/settings", response_model=ReflectionSettings)
+def set_reflection_settings(body: ReflectionSettingsIn):
+    store.save_settings({"questions_on": body.questions_on})
+    return reflection_settings()
+
+
+@app.get("/api/reflection/related/{entry_id}", response_model=RelatedOut)
+def related_entries(entry_id: str, limit: int = 3):
+    """Past entries close to this one. Pull-based: nothing calls this uninvited."""
+    by_id = {e["id"]: e for e in store.entries()}
+    if entry_id not in by_id:
+        raise HTTPException(404, "That entry isn't in your journal.")
+
+    try:
+        hits = relevance.related_to_entry(entry_id, limit=limit)
+    except Exception as exc:  # noqa: BLE001 - no match is a fine answer; an error is not
+        print(f"index: lookup failed ({exc})", file=sys.stderr)
+        hits = []
+
+    out = []
+    for hit in hits:
+        row = by_id.get(hit["id"])
+        if row:  # an id the ledger no longer has is simply dropped
+            out.append(RelatedEntry(entry=_entry_out(row), score=hit["score"]))
+    return RelatedOut(related=out, matching=_matching_kind())
+
+
 # --- egress + demo (M7) -----------------------------------------------------
 
 
@@ -505,9 +627,13 @@ def export_everything(include_demo: bool = False):
 
 @app.post("/api/demo/load")
 def load_demo():
-    return demo_data.load()
+    result = demo_data.load()
+    _resync_index()
+    return result
 
 
 @app.post("/api/demo/wipe", response_model=WipeOut)
 def wipe_demo():
-    return WipeOut(**store.wipe_demo())
+    result = store.wipe_demo()
+    _resync_index()
+    return WipeOut(**result)
