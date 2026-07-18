@@ -16,6 +16,16 @@ keeping receipts so the picture of your life stays honest and revisable.
   technical docs and code; the UI says things like "believed then / know now", "keeps receipts",
   "your words never leave this device". Technical framing is fine for technical folks — but the
   product speaks human.
+- **Copy sounds like a person, not a machine.** No em-dashes in on-screen copy (they read as
+  AI-written); plain sentences, ordinary words. Prompt phrasing follows the journaling research
+  (research/2026-07-14-journal-grounding.md), not invention: invite a *specific* feeling word,
+  capture the antecedent, keep the "why" light so it never becomes rumination.
+- **Prompt hints stay.** The small grey hints under each question earn their place — they give
+  permission ("no need to be sure") rather than instruct.
+- **A short usage guide before the first entry** _(owner, 2026-07-18 — proposed, tentative)._
+  People shouldn't land on a blank form and have to guess what this is for. A brief, skippable
+  orientation before they kick things off: what the four questions are for, that mess is fine,
+  that nothing leaves the device. Never a gate, never a tour that must be completed.
 
 ## First principles (owner, 2026-07-18)
 - **No machine ever tells a user what they feel.** No predictive models, no markov-chain
