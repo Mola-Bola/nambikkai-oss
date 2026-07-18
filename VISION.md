@@ -17,6 +17,21 @@ keeping receipts so the picture of your life stays honest and revisable.
   "your words never leave this device". Technical framing is fine for technical folks — but the
   product speaks human.
 
+## First principles (owner, 2026-07-18)
+- **No machine ever tells a user what they feel.** No predictive models, no markov-chain
+  mood-forecasting, no sentiment score asserted as fact. Feelings are not to be trifled with;
+  the product's power is each individual realising their truths for themselves. Nambikkai hands
+  people tools — never conclusions. Wherever the engine digests (import M4, timeline M6),
+  machine output is a *question offered* ("does this sound right to you?"), never a label
+  asserted. The user confirms, edits, or dismisses; only their answer enters the record.
+- **Against the feed, for connection.** Human connectivity is needed at an all-time high.
+  Algorithms today think for us and feed us what we want, not what we humans need — connection
+  to nature, to one another, to ourselves. Nambikkai exists to restore that: nambikkai in
+  themselves, in others, in the world.
+- **The builder's own story moves the platform.** From life-os, the work with AI, where that took
+  him — that arc (how Nambikkai started, shifted, and where it's headed) is the narrative spine
+  for telling the product's story. Not needed now; never forgotten.
+
 ## Core loops (MVP horizon)
 
 ### 1 · Directed loose journaling
