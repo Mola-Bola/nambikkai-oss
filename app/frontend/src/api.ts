@@ -24,6 +24,9 @@ export type YouResult = S["YouOut"];
 export type ImportResult = S["ImportOut"];
 export type HealthResult = S["HealthOut"];
 export type EntryKind = EntryDraft["kind"];
+export type RelatedResult = S["RelatedOut"];
+export type RelatedEntry = S["RelatedEntry"];
+export type ReflectionSettings = S["ReflectionSettings"];
 
 async function call<T>(url: string, init?: RequestInit, fallback = "Something didn't work."): Promise<T> {
   const res = await fetch(url, {
@@ -76,6 +79,25 @@ export const getYou = () => call<YouResult>("/api/you");
 export const loadDemo = () => call<{ loaded: boolean }>("/api/demo/load", post());
 
 export const wipeDemo = () => call<{ removed: number }>("/api/demo/wipe", post());
+
+// --- reflection (ADR 003) ---------------------------------------------------
+// These return the user's own records and a score. There is no endpoint here
+// that returns a generated sentence, because none exists to call.
+
+export const getRelated = (entryId: string) =>
+  call<RelatedResult>(`/api/reflection/related/${entryId}`);
+
+export const getRelatedToDraft = (text: string) =>
+  call<RelatedResult>("/api/reflection/related", post({ text }));
+
+export const getReflectionSettings = () =>
+  call<ReflectionSettings>("/api/reflection/settings");
+
+export const setQuestionsOn = (questionsOn: boolean) =>
+  call<ReflectionSettings>("/api/reflection/settings", {
+    method: "PUT",
+    body: JSON.stringify({ questions_on: questionsOn }),
+  });
 
 export async function exportBundle(): Promise<unknown> {
   return call<unknown>("/api/export");

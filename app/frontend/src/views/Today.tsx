@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { EntryDraft, EntryKind, Persona, saveEntry } from "../api";
+import Reflection from "./Reflection";
 
 // All screen copy is layman-first (VISION · Audience & voice): no engine words,
 // no em-dashes, plain sentences. Prompt phrasing follows the journaling
@@ -36,9 +37,11 @@ const EMPTY: EntryDraft = {
 export default function Today({
   people,
   onSaved,
+  questionsOn,
 }: {
   people: Persona[];
   onSaved: () => void;
+  questionsOn: boolean;
 }) {
   const [draft, setDraft] = useState<EntryDraft>({ ...EMPTY });
   const [choiceNeeded, setChoiceNeeded] = useState<string[] | null>(null);
@@ -199,6 +202,19 @@ export default function Today({
             {saving ? "Keeping…" : "Keep this"}
           </button>
         )}
+
+        {/* Appears only after a pause in writing, and only as a line to click.
+            Nothing here interrupts a sentence in progress. */}
+        <Reflection
+          draft={
+            draft.kind === "guided"
+              ? PROMPTS.map((p) => draft[p.field] ?? "").join(" ")
+              : draft.body ?? ""
+          }
+          people={people}
+          questionsOn={questionsOn}
+          onAnswered={onSaved}
+        />
 
         {toast && <p className="toast">{toast}</p>}
         {error && <p className="error">{error}</p>}

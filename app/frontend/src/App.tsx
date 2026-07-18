@@ -4,10 +4,12 @@ import {
   Entry,
   LooseEnd,
   Persona,
+  ReflectionSettings,
   Truth,
   YouResult,
   answerLooseEnd,
   getHealth,
+  getReflectionSettings,
   getYou,
   listEntries,
   listLooseEnds,
@@ -43,19 +45,21 @@ export default function App() {
   const [you, setYou] = useState<YouResult | null>(null);
   const [chain, setChain] = useState<ChainState | null>(null);
   const [demoLoaded, setDemoLoaded] = useState(false);
+  const [reflection, setReflection] = useState<ReflectionSettings | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Dismissed for this session only: "later" must never mean "never".
   const [hushed, setHushed] = useState<string[]>([]);
 
   const refresh = useCallback(async () => {
     try {
-      const [e, p, t, l, y, h] = await Promise.all([
+      const [e, p, t, l, y, h, r] = await Promise.all([
         listEntries(),
         listPersonas(),
         listTruths(),
         listLooseEnds(),
         getYou(),
         getHealth(),
+        getReflectionSettings(),
       ]);
       setEntries(e.entries);
       setChain(e.chain);
@@ -64,6 +68,7 @@ export default function App() {
       setLooseEnds(l);
       setYou(y);
       setDemoLoaded(h.demo_loaded ?? false);
+      setReflection(r);
       setError(null);
     } catch (err) {
       setError((err as Error).message);
@@ -108,7 +113,13 @@ export default function App() {
         )}
         {error && <p className="error">{error}</p>}
 
-        {screen === "today" && <Today people={people} onSaved={refresh} />}
+        {screen === "today" && (
+          <Today
+            people={people}
+            onSaved={refresh}
+            questionsOn={reflection?.questions_on ?? false}
+          />
+        )}
         {screen === "journal" && (
           <Journal
             entries={entries}
@@ -117,13 +128,17 @@ export default function App() {
             writtenDays={you?.written_days ?? []}
             truthDays={you?.truth_days ?? []}
             yearAgo={you?.year_ago ?? []}
+            questionsOn={reflection?.questions_on ?? false}
+            onChanged={refresh}
           />
         )}
         {screen === "people" && <People people={people} onChanged={refresh} />}
         {screen === "truths" && <Truths truths={truths} people={people} onChanged={refresh} />}
         {screen === "bring" && <BringIn onImported={refresh} />}
         {screen === "you" && <You you={you} />}
-        {screen === "settings" && <Settings demoLoaded={demoLoaded} onChanged={refresh} />}
+        {screen === "settings" && (
+          <Settings demoLoaded={demoLoaded} reflection={reflection} onChanged={refresh} />
+        )}
       </main>
 
       {/* A loose end is an offer, never a gate. "Later" is always a real answer. */}

@@ -595,6 +595,33 @@ def set_reflection_settings(body: ReflectionSettingsIn):
     return reflection_settings()
 
 
+class RelatedTextIn(BaseModel):
+    text: str
+
+
+@app.post("/api/reflection/related", response_model=RelatedOut)
+def related_to_draft(body: RelatedTextIn):
+    """Past entries close to something still being written.
+
+    The draft is embedded and thrown away. Nothing is stored, nothing is
+    written to any stream, and the draft never becomes a record by being looked
+    at: only pressing Keep does that.
+    """
+    try:
+        hits = relevance.related_to_text(body.text)
+    except Exception as exc:  # noqa: BLE001
+        print(f"index: draft lookup failed ({exc})", file=sys.stderr)
+        hits = []
+
+    by_id = {e["id"]: e for e in store.entries()}
+    out = [
+        RelatedEntry(entry=_entry_out(by_id[h["id"]]), score=h["score"])
+        for h in hits
+        if h["id"] in by_id
+    ]
+    return RelatedOut(related=out, matching=_matching_kind())
+
+
 @app.get("/api/reflection/related/{entry_id}", response_model=RelatedOut)
 def related_entries(entry_id: str, limit: int = 3):
     """Past entries close to this one. Pull-based: nothing calls this uninvited."""

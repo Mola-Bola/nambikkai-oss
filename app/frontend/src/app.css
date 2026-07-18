@@ -748,3 +748,121 @@ dd {
     gap: 2px;
   }
 }
+
+/* --- reflection (ADR 003) ---
+ * Deliberately quiet. The hint is a line of text, not a card, not a badge and
+ * not a colour that pulls the eye off what someone is writing. It only exists
+ * once there is something behind it, and it opens on a click. Structure and
+ * tokens only here, so a reskin can land over the top of it cleanly. */
+
+.reflect {
+  margin: 10px 0 0;
+}
+
+.reflect-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+
+.reflect-hint:hover {
+  color: var(--teal);
+}
+
+.reflect-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+}
+
+.reflect-more {
+  margin-left: auto;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reflect-body {
+  padding: 4px 0 2px;
+}
+
+.reflect-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.reflect-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+
+.reflect-ask {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.reflect-ask b {
+  display: block;
+  color: var(--teal);
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.reflect-ask textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.toggle {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 10px 0 6px;
+  cursor: pointer;
+}
+
+.toggle input {
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.toggle b {
+  display: block;
+  font-weight: 600;
+}
+
+.toggle small {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.toggle code {
+  font-family: var(--mono);
+  font-size: 13px;
+}

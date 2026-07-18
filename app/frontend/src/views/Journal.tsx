@@ -1,4 +1,5 @@
 import { ChainState, Entry, Persona } from "../api";
+import Reflection from "./Reflection";
 
 const PROMPT_LABELS: Record<string, string> = {
   feeling: "How are you feeling?",
@@ -87,6 +88,8 @@ export default function Journal({
   writtenDays,
   truthDays,
   yearAgo,
+  questionsOn,
+  onChanged,
 }: {
   entries: Entry[];
   people: Persona[];
@@ -94,6 +97,8 @@ export default function Journal({
   writtenDays: string[];
   truthDays: string[];
   yearAgo: Entry[];
+  questionsOn: boolean;
+  onChanged: () => void;
 }) {
   return (
     <>
@@ -120,6 +125,12 @@ export default function Journal({
         entries.map((e) => (
           <div className="card" key={e.id}>
             <EntryCard entry={e} people={people} />
+            <Reflection
+              entryId={e.id}
+              people={people}
+              questionsOn={questionsOn}
+              onAnswered={onChanged}
+            />
           </div>
         ))
       )}

@@ -177,6 +177,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reflection/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reflection Settings */
+        get: operations["reflection_settings_api_reflection_settings_get"];
+        /** Set Reflection Settings */
+        put: operations["set_reflection_settings_api_reflection_settings_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reflection/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Related To Draft
+         * @description Past entries close to something still being written.
+         *
+         *     The draft is embedded and thrown away. Nothing is stored, nothing is
+         *     written to any stream, and the draft never becomes a record by being looked
+         *     at: only pressing Keep does that.
+         */
+        post: operations["related_to_draft_api_reflection_related_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reflection/related/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Related Entries
+         * @description Past entries close to this one. Pull-based: nothing calls this uninvited.
+         */
+        get: operations["related_entries_api_reflection_related__entry_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/export": {
         parameters: {
             query?: never;
@@ -516,6 +578,72 @@ export interface components {
              * @default
              */
             last_line: string;
+        };
+        /**
+         * ReflectionSettings
+         * @description Everything the reflection loop is allowed to do, and its default answer.
+         *
+         *     questions_on is FALSE by default and only the user may change it (ADR 003).
+         */
+        ReflectionSettings: {
+            /**
+             * Questions On
+             * @default false
+             */
+            questions_on: boolean;
+            /**
+             * Matching
+             * @default shared words only
+             * @enum {string}
+             */
+            matching: "meaning" | "shared words only";
+            /**
+             * Model Present
+             * @default false
+             */
+            model_present: boolean;
+            /**
+             * Indexed
+             * @default 0
+             */
+            indexed: number;
+        };
+        /** ReflectionSettingsIn */
+        ReflectionSettingsIn: {
+            /** Questions On */
+            questions_on: boolean;
+        };
+        /**
+         * RelatedEntry
+         * @description A past entry offered beside the one in front of you.
+         *
+         *     `entry` is the user's own record, verbatim from the ledger. There is no
+         *     field here for a summary, a theme, a label or a reason, and there must
+         *     never be one: ADR 003 puts the user's words on screen or nothing.
+         */
+        RelatedEntry: {
+            entry: components["schemas"]["EntryOut"];
+            /** Score */
+            score: number;
+        };
+        /** RelatedOut */
+        RelatedOut: {
+            /**
+             * Related
+             * @default []
+             */
+            related: components["schemas"]["RelatedEntry"][];
+            /**
+             * Matching
+             * @default shared words only
+             * @enum {string}
+             */
+            matching: "meaning" | "shared words only";
+        };
+        /** RelatedTextIn */
+        RelatedTextIn: {
+            /** Text */
+            text: string;
         };
         /** SaveOut */
         SaveOut: {
@@ -1023,6 +1151,125 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["YouOut"];
+                };
+            };
+        };
+    };
+    reflection_settings_api_reflection_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReflectionSettings"];
+                };
+            };
+        };
+    };
+    set_reflection_settings_api_reflection_settings_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReflectionSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReflectionSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    related_to_draft_api_reflection_related_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RelatedTextIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RelatedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    related_entries_api_reflection_related__entry_id__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RelatedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

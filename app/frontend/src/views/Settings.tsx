@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { exportBundle, loadDemo, wipeDemo } from "../api";
+import { ReflectionSettings, exportBundle, loadDemo, setQuestionsOn, wipeDemo } from "../api";
 
 const PROMISES = [
   "Your words stay on this device. There is no cloud copy to breach.",
@@ -12,9 +12,11 @@ const PROMISES = [
 
 export default function Settings({
   demoLoaded,
+  reflection,
   onChanged,
 }: {
   demoLoaded: boolean;
+  reflection: ReflectionSettings | null;
   onChanged: () => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
@@ -45,6 +47,46 @@ export default function Settings({
             <li key={p}>{p}</li>
           ))}
         </ul>
+      </section>
+
+      <section className="card">
+        <strong>Looking back</strong>
+        <p className="whisper">
+          When something you write sits close to something you wrote before, a quiet line
+          offers it. You click if you want it. What you see is your own writing, word for
+          word, and nothing else.
+        </p>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={reflection?.questions_on ?? false}
+            disabled={busy !== null}
+            onChange={(e) => {
+              const on = e.target.checked;
+              withBusy("questions", async () => {
+                await setQuestionsOn(on);
+                return on
+                  ? "Gentle questions are on. They only ever ask, and you can turn them off here."
+                  : "Gentle questions are off.";
+              });
+            }}
+          />
+          <span>
+            <b>Let it ask me a gentle question</b>
+            <small>
+              Off unless you turn it on. When it is on, you may see a short question next to
+              writing it brought back, like "does this still sound right to you?". It asks,
+              it never concludes, and only your answer is kept.
+            </small>
+          </span>
+        </label>
+        {reflection && reflection.matching === "shared words only" && (
+          <p className="whisper">
+            Matching is basic right now: it compares words, not meaning. Running{" "}
+            <code>make model</code> once adds the small offline model that does the rest. It
+            stays on this device like everything else.
+          </p>
+        )}
       </section>
 
       <section className="card">
