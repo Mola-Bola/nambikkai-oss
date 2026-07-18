@@ -17,6 +17,7 @@ import {
   listTruths,
 } from "./api";
 import BringIn from "./views/BringIn";
+import Guide from "./views/Guide";
 import Journal from "./views/Journal";
 import People from "./views/People";
 import Settings from "./views/Settings";
@@ -46,6 +47,7 @@ export default function App() {
   const [chain, setChain] = useState<ChainState | null>(null);
   const [demoLoaded, setDemoLoaded] = useState(false);
   const [reflection, setReflection] = useState<ReflectionSettings | null>(null);
+  const [guideSeen, setGuideSeen] = useState(true); // assume seen until told otherwise
   const [error, setError] = useState<string | null>(null);
   // Dismissed for this session only: "later" must never mean "never".
   const [hushed, setHushed] = useState<string[]>([]);
@@ -68,6 +70,7 @@ export default function App() {
       setLooseEnds(l);
       setYou(y);
       setDemoLoaded(h.demo_loaded ?? false);
+      setGuideSeen(h.guide_seen ?? true);
       setReflection(r);
       setError(null);
     } catch (err) {
@@ -112,6 +115,12 @@ export default function App() {
           </div>
         )}
         {error && <p className="error">{error}</p>}
+
+        {/* Before the first entry only, and above the form rather than over
+            it, so writing is never blocked by an explanation of writing. */}
+        {screen === "today" && !guideSeen && entries.length === 0 && (
+          <Guide onDone={() => setGuideSeen(true)} />
+        )}
 
         {screen === "today" && (
           <Today

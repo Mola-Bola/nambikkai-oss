@@ -102,3 +102,7 @@ export const setQuestionsOn = (questionsOn: boolean) =>
 export async function exportBundle(): Promise<unknown> {
   return call<unknown>("/api/export");
 }
+
+// The orientation before the first entry. Marked seen whether it is read or
+// skipped: waving it off is a real answer and must stick.
+export const markGuideSeen = () => call<{ seen: boolean }>("/api/guide/seen", post());

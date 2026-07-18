@@ -182,6 +182,13 @@ class HealthOut(BaseModel):
     ok: bool
     chain: ChainState
     demo_loaded: bool = False
+    # Whether the orientation has been shown. App state, like demo_loaded, and
+    # it rides along here so the first screen needs no extra round trip.
+    guide_seen: bool = False
+
+
+class GuideOut(BaseModel):
+    seen: bool
 
 
 class EntriesOut(BaseModel):
@@ -322,7 +329,24 @@ def _truth_out(row: dict, names: dict | None = None) -> TruthOut:
 
 @app.get("/api/health", response_model=HealthOut)
 def health():
-    return HealthOut(ok=True, chain=_chain_state(), demo_loaded=store.has_demo())
+    return HealthOut(
+        ok=True,
+        chain=_chain_state(),
+        demo_loaded=store.has_demo(),
+        guide_seen=store.settings()["guide_seen"],
+    )
+
+
+@app.post("/api/guide/seen", response_model=GuideOut)
+def guide_seen():
+    """Remember that the orientation has been shown, so it never nags.
+
+    Set when the reader finishes it OR skips it: skipping is a real answer, and
+    an orientation that comes back after being waved off is a gate wearing a
+    friendly hat.
+    """
+    store.save_settings({"guide_seen": True})
+    return GuideOut(seen=True)
 
 
 @app.get("/api/entries", response_model=EntriesOut)

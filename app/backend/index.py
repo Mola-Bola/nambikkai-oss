@@ -24,7 +24,13 @@ import os
 import struct
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(os.path.dirname(_HERE))
+sys.path.insert(0, _HERE)
+# store.py reaches into the engine's redaction net, so the hooks directory has
+# to be importable when this file is run directly as `make index` rather than
+# through the app. Without it the rebuild command dies on import.
+sys.path.insert(0, os.path.join(_ROOT, "plugin", "hooks"))
 
 import embed  # noqa: E402
 import ledger  # noqa: E402

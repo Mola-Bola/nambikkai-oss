@@ -385,6 +385,29 @@ def index_is_rebuildable():
         )
 
 
+def the_rebuild_command_runs():
+    """`make index` must actually start.
+
+    It did not, once: index.py imports store, store imports the engine's
+    redaction net, and running the file directly rather than through the app
+    left that off sys.path. The suite exercised backfill() as a function and
+    never noticed. So the command is run here as a command.
+    """
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, os.path.join(ROOT, "app", "backend", "index.py")],
+        capture_output=True,
+        text=True,
+        env={**os.environ, "NAMBIKKAI_DATA": TMP},
+    )
+    if result.returncode != 0:
+        fails.append(
+            f"make index: the rebuild command failed to run: "
+            f"{(result.stderr or result.stdout).strip().splitlines()[-1:]}"
+        )
+
+
 def a_wrong_backend_rebuilds_not_mixes():
     """Vectors from two backends must never end up in one table."""
     relevance.backfill(rebuild=True)
@@ -475,6 +498,7 @@ def main():
     index_leaves_the_ledger_alone(c)
     thin_entries(c)
     index_is_rebuildable()
+    the_rebuild_command_runs()
     a_wrong_backend_rebuilds_not_mixes()
     related_returns_only_the_users_words(c)
     questions_are_off_by_default(c)

@@ -21,6 +21,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/guide/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Guide Seen
+         * @description Remember that the orientation has been shown, so it never nags.
+         *
+         *     Set when the reader finishes it OR skips it: skipping is a real answer, and
+         *     an orientation that comes back after being waved off is a gate wearing a
+         *     friendly hat.
+         */
+        post: operations["guide_seen_api_guide_seen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/entries": {
         parameters: {
             query?: never;
@@ -419,6 +443,11 @@ export interface components {
              */
             ttl: string;
         };
+        /** GuideOut */
+        GuideOut: {
+            /** Seen */
+            seen: boolean;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -434,6 +463,11 @@ export interface components {
              * @default false
              */
             demo_loaded: boolean;
+            /**
+             * Guide Seen
+             * @default false
+             */
+            guide_seen: boolean;
         };
         /** ImportIn */
         ImportIn: {
@@ -807,6 +841,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthOut"];
+                };
+            };
+        };
+    };
+    guide_seen_api_guide_seen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuideOut"];
                 };
             };
         };

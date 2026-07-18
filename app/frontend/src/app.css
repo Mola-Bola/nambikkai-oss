@@ -866,3 +866,50 @@ dd {
   font-family: var(--mono);
   font-size: 13px;
 }
+
+/* --- usage guide ---
+ * Sits above the writing card, never over it. Nothing here overlays, traps
+ * focus, or has to be completed. */
+
+.guide {
+  border-left: 3px solid var(--sage);
+}
+
+.guide-lead {
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+
+.guide-list {
+  margin: 0 0 14px 18px;
+  padding: 0;
+}
+
+.guide-list li {
+  margin-bottom: 8px;
+  line-height: 1.55;
+}
+
+.guide-list b {
+  font-weight: 600;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.guide-grid b {
+  display: block;
+  color: var(--teal);
+  font-size: 16px;
+}
+
+.guide-grid span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
