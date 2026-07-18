@@ -68,8 +68,9 @@ now judged by what it protects.
 
 ## Status
 
-Telegram-first MVP, riding the life-OS it was extracted from. The builder is user #1;
-the product generalises from what demonstrably works on a real life, not a persona.
+Local web-app MVP (charter 2026-07-17): a FastAPI backend wrapping the engine, a
+React front, everything on localhost. The builder is user #1; the product generalises
+from what demonstrably works on a real life, not a persona.
 
 - **Capture** — a `journal:` message routes to the chained truth ledger (shipped)
 - **Reflection loop** — weekly, gentle-suggestive, self-distancing by design; drafts
@@ -97,7 +98,7 @@ nambikkai/
 
 ## License
 
-[MIT](LICENSE) © The Nambikkai authors
+[MIT](LICENSE) © [publisher TBD]
 
 ---
 

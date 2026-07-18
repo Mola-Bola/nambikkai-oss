@@ -72,7 +72,7 @@ routing, schema, name-to-role swap, and chain tamper-evidence — the day it was
 
 ## The shape of the bet
 
-Telegram-first MVP on the builder's own life-OS rails; the builder is user #1. The
+A local-first web app, everything on the user's own device; the builder is user #1. The
 product generalises outward from one demonstrably-served life, not inward from a
 persona. Habit tracking joins only after the journal loop earns daily use — and it
 will reward *returning after a gap* over streaks, because the person the product
@@ -80,7 +80,7 @@ exists for is the one having the bad week.
 
 ## The team
 
-The Nambikkai authors — currently one human (systems background in observability and security
+[Publisher name TBD] — currently one human (systems background in observability and security
 platforms) and their agents, building from a system they actually live in.
 
 *நம்பிக்கை — trust, faith, hope. A word that has to be earned — now from a person,
