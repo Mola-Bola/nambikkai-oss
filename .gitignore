@@ -1,5 +1,11 @@
 .nambikkai/
 tests/.test-alerts.log
+
+# app (M2+): user words never enter git; toolchains rebuild locally
+/data/
+.venv/
+node_modules/
+app/frontend/dist/
 site/
 __pycache__/
 .DS_Store
