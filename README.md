@@ -7,8 +7,9 @@ involves (by role, never by name), and what you believe about it. It keeps those
 beliefs the way an accountant keeps books: every entry carries provenance, every
 belief carries *valid-from* and *valid-to*, and nothing is ever silently rewritten.
 Over time it can show you where an ease or an unease actually stems from — "what I
-believed then" next to "what I know now" — and a gentle weekly reflection helps you
-unweave the tangles at your own pace.
+believed then" next to "what I know now" — and when something you write sits close to
+something you wrote before, it can put the two side by side, in your own words, for you
+to draw your own conclusion from.
 
 Not a chat app with memory. A ledger of personal truths, with an agent in service of it.
 
@@ -26,8 +27,9 @@ appraisal — emotions arise largely from what you believe about an event or a p
 and revising the appraisal revises the feeling. A bitemporal belief ledger is
 reappraisal with receipts. The science on writing it down is real and honest-sized:
 naming a feeling precisely is itself regulating (affect labelling), and the effects of
-expressive writing roughly *double* when the writing gets feedback — which is exactly
-what the reflection loop is.
+expressive writing roughly *double* when the writing gets feedback. The reflection loop
+is our answer to that last part, with one deliberate constraint: the feedback is your
+own earlier writing placed beside the new, never a machine's opinion of it.
 
 And one line we hold everywhere, in copy and in code: **Nambikkai is a journal, never
 therapy.** No diagnosis, no treatment language, anywhere. When the record looks heavy,

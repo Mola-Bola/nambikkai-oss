@@ -312,6 +312,48 @@ def questions_are_a_fixed_set():
 # --- the promises -----------------------------------------------------------
 
 
+def the_guide_is_not_a_gate():
+    """The orientation must be structurally unable to block writing.
+
+    Copy promising "you can skip this" is worth nothing if the thing is a modal.
+    So this checks the shape rather than the words: no dialog role, no overlay,
+    no focus trap. It renders in the page flow above the form, or it fails.
+    """
+    path = os.path.join(ROOT, "app", "frontend", "src", "views", "Guide.tsx")
+    if not os.path.exists(path):
+        fails.append("guide: Guide.tsx is missing, so the orientation cannot be checked")
+        return
+    with open(path, encoding="utf-8") as f:
+        source = f.read()
+
+    for shape in ('role="dialog"', 'role="alertdialog"', "position: fixed", "createPortal"):
+        if shape in source:
+            fails.append(f"GUIDE IS A GATE: it uses {shape!r}, which can block the form")
+
+    # It must offer a way past it that does not involve reading it.
+    if "Skip" not in source:
+        fails.append("guide: no skip option, so it can only be completed and not declined")
+
+    # And skipping must be remembered, or it comes back and becomes a gate.
+    # Both buttons have to run the same dismissal, not just the finish one.
+    if source.count("onClick={dismiss}") != 2:
+        fails.append(
+            "guide: finishing and skipping must both run the same dismissal, "
+            "or skipping is not really an answer"
+        )
+    if "markGuideSeen" not in source:
+        fails.append("guide: dismissing it is never remembered, so it will come back")
+
+
+def weights_and_words_never_enter_git():
+    """Neither the user's writing nor the model may be committable."""
+    with open(os.path.join(ROOT, ".gitignore"), encoding="utf-8") as f:
+        ignored = f.read()
+    for path in ("/data/", "/models/"):
+        if path not in ignored:
+            fails.append(f"git: {path} must be gitignored and is not")
+
+
 def model_runs_offline():
     """Prove it, do not assert it: break the network and embed anyway."""
     if not embed.model_present():
@@ -507,6 +549,8 @@ def main():
     copy_never_asserts()
     the_copy_check_actually_works()
     questions_are_a_fixed_set()
+    the_guide_is_not_a_gate()
+    weights_and_words_never_enter_git()
     model_runs_offline()
     no_fetching_in_app_code()
 
