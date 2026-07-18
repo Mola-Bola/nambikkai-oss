@@ -22,7 +22,7 @@ keeping receipts so the picture of your life stays honest and revisable.
   capture the antecedent, keep the "why" light so it never becomes rumination.
 - **Prompt hints stay.** The small grey hints under each question earn their place — they give
   permission ("no need to be sure") rather than instruct.
-- **A short usage guide before the first entry** _(owner, 2026-07-18 — proposed, tentative)._
+- **A short usage guide before the first entry** _(owner, 2026-07-18 — ACCEPTED, built)._
   People shouldn't land on a blank form and have to guess what this is for. A brief, skippable
   orientation before they kick things off: what the four questions are for, that mess is fine,
   that nothing leaves the device. Never a gate, never a tour that must be completed.
@@ -34,6 +34,10 @@ keeping receipts so the picture of your life stays honest and revisable.
   people tools — never conclusions. Wherever the engine digests (import M4, timeline M6),
   machine output is a *question offered* ("does this sound right to you?"), never a label
   asserted. The user confirms, edits, or dismisses; only their answer enters the record.
+  **Settled 2026-07-18: no machine-coloured days, ever.** The mood graph from the early mock
+  (days tinted by feeling-word, a tone line drawn across the month) is dead and stays dead.
+  The month grid marks only *you wrote here* and *a truth changed here*. This was the last
+  open question against this principle and it is now closed, not deferred (ADR 003).
 - **Against the feed, for connection.** Human connectivity is needed at an all-time high.
   Algorithms today think for us and feed us what we want, not what we humans need — connection
   to nature, to one another, to ourselves. Nambikkai exists to restore that: nambikkai in
@@ -74,6 +78,24 @@ written, no cold start.)
 A ledger of one-sentence highlights/sentiments — the digestible big picture of a life. The
 surface where users see themselves whole.
 
+### 6 · Reflection (owner decisions, 2026-07-18 — accepted, ADR 003)
+The loop that makes a journal worth keeping: your past writing, brought back to you at the
+moment it's relevant. Three decisions fix its shape.
+
+- **Silent juxtaposition is the default.** While writing or reading, related past entries can
+  be revealed beside the current one — your own words, raw, nothing else. No summary, no theme
+  name, no score on screen. The pairing *is* the insight, and you're the one who has it.
+- **Pull, never push.** A faint mark says there's something related. You click, or you don't.
+  Nothing pops up mid-sentence.
+- **A gentle-question layer, opt-in and off by default.** When switched on, the app may ask a
+  soft question about what surfaced — "does this still sound right to you?" — drawn from a
+  small set of phrases a human wrote. It never states what you felt. Your answer is the only
+  thing that enters the record; a dismissed question leaves no trace.
+- **Matching is local.** Semantic search on the device (sqlite-vec plus a small local model).
+  The model is fetched once by an explicit, checksummed step, never silently at runtime, and
+  no entry text is ever sent anywhere to be matched. The index is derived and rebuildable;
+  the ledger stays the only source of truth.
+
 ## Second horizon
 - **Habits, holistically:** good habits compound; log manually AND (opt-in, reasonable) fetch
   natively — screen time, sleep, etc. from phone systems — when the user says they want to cut
@@ -111,4 +133,4 @@ surface where users see themselves whole.
 
 ## Sequencing sanity (proposed, owner steers)
 Capture (shipped) → Import & digestion (wedge) → Persona map + loose-end popups → Truths ledger
-surfaces → Sentiment timeline → Reflection loop v1 (corpus-calibrated) → habits → the rest.
+surfaces → Sentiment timeline → Reflection loop v1 (local semantic, ADR 003) → habits → the rest.
