@@ -8,6 +8,15 @@ update THIS file — roadmap thoughts do not live in chat or life-os handoffs an
 A journal that maps what you feel, who shaped it, and what you've concluded about them —
 keeping receipts so the picture of your life stays honest and revisable.
 
+## Audience & voice (owner steering, 2026-07-18)
+- **Built for individuals** — one person, their own device, their own life. Teams/groups are
+  third-horizon at most; nothing in the MVP assumes an org.
+- **Layman-first wording everywhere a user reads.** People in general don't know what
+  "provenance" is. Engine jargon (provenance, bitemporal, ledger, redaction, egress) stays in
+  technical docs and code; the UI says things like "believed then / know now", "keeps receipts",
+  "your words never leave this device". Technical framing is fine for technical folks — but the
+  product speaks human.
+
 ## Core loops (MVP horizon)
 
 ### 1 · Directed loose journaling
