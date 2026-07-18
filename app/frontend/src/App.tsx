@@ -16,10 +16,10 @@ const GUIDED_PROMPTS: {
   label: string;
   hint: string;
 }[] = [
-  { field: "feeling", label: "What are you feeling?", hint: "however it comes out" },
+  { field: "feeling", label: "How are you feeling?", hint: "the closest word you can find, even just one" },
   { field: "why", label: "Why, do you think?", hint: "no need to be sure" },
-  { field: "cause", label: "Who or what stirred it?", hint: "a person, a pet, a place, a thing" },
-  { field: "helps", label: "What helps?", hint: "what you're doing about it — or what's helped before" },
+  { field: "cause", label: "Who or what brought it on?", hint: "a person, a pet, a place, a thing" },
+  { field: "helps", label: "What helps, now or before?", hint: "even a small thing counts" },
 ];
 
 const EMPTY_DRAFT: EntryDraft = {
@@ -102,7 +102,7 @@ export default function App() {
     <div className="page">
       <header>
         <h1>நம்பிக்கை · Nambikkai</h1>
-        <p className="tagline">Your journal. Yours alone — it never leaves this computer.</p>
+        <p className="tagline">Your journal, and yours alone. It never leaves this computer.</p>
       </header>
 
       <main>
@@ -126,39 +126,41 @@ export default function App() {
             </button>
           </div>
 
-          {draft.kind === "guided" ? (
-            <>
-              <p className="intro">Four small questions. Answer any of them — skip the rest.</p>
-              {GUIDED_PROMPTS.map((p) => (
-                <label key={p.field} className="prompt">
-                  <span>{p.label}</span>
-                  <textarea
-                    rows={2}
-                    value={draft[p.field]}
-                    placeholder={p.hint}
-                    onChange={(e) => setField(p.field, e.target.value)}
-                  />
-                </label>
-              ))}
-            </>
-          ) : (
-            <>
-              <p className="intro">Write anything, any shape. The mess is fine.</p>
-              <textarea
-                className="freebox"
-                rows={10}
-                value={draft.body}
-                placeholder="It doesn't have to make sense to anyone — including you, yet."
-                onChange={(e) => setField("body", e.target.value)}
-              />
-            </>
-          )}
+          <div className="mode-body" key={draft.kind}>
+            {draft.kind === "guided" ? (
+              <>
+                <p className="intro">A few gentle prompts. Follow any that fit, and leave the rest.</p>
+                {GUIDED_PROMPTS.map((p) => (
+                  <label key={p.field} className="prompt">
+                    <span>{p.label}</span>
+                    <textarea
+                      rows={2}
+                      value={draft[p.field]}
+                      placeholder={p.hint}
+                      onChange={(e) => setField(p.field, e.target.value)}
+                    />
+                  </label>
+                ))}
+              </>
+            ) : (
+              <>
+                <p className="intro">Write anything, any shape. The mess is fine.</p>
+                <textarea
+                  className="freebox"
+                  rows={10}
+                  value={draft.body}
+                  placeholder="It doesn't have to make sense to anyone. Not even you, not yet."
+                  onChange={(e) => setField("body", e.target.value)}
+                />
+              </>
+            )}
+          </div>
 
           {choiceNeeded ? (
             <div className="privacy-card" role="alertdialog" aria-label="Before this is kept">
               <p>
-                This entry seems to include {choiceNeeded.join(" and ")}. Your journal doesn't
-                need it to remember the day — and either way, nothing leaves this computer.
+                This entry looks like it has {choiceNeeded.join(" and ")} in it. Your journal
+                doesn't need that to remember the day, and either way, nothing leaves this computer.
               </p>
               <div className="choices">
                 <button onClick={() => submit("blur")} disabled={saving}>
@@ -220,7 +222,7 @@ export default function App() {
             </p>
           ) : (
             <p className="error">
-              The seal on your record looks broken — your words are still here, but something
+              The seal on your record looks broken. Your words are still here, but something
               changed the file outside the app.
             </p>
           ))}

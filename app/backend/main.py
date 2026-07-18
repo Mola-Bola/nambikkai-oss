@@ -71,7 +71,7 @@ def create_entry(e: EntryIn):
     fields = GUIDED_FIELDS if e.kind == "guided" else ("body",)
     texts = {f: getattr(e, f).strip() for f in fields}
     if not any(texts.values()):
-        raise HTTPException(400, "Nothing to keep yet — write a little first.")
+        raise HTTPException(400, "Nothing to keep yet. Write a little first.")
 
     combined = "\n".join(v for v in texts.values() if v)
     found_kinds = {f.kind for f in sweep(combined)} & BLOCKING_KINDS

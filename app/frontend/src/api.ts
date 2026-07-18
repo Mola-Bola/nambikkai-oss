@@ -42,7 +42,7 @@ export async function saveEntry(draft: EntryDraft): Promise<SaveResult> {
   });
   if (!res.ok) {
     const detail = (await res.json().catch(() => null))?.detail;
-    throw new Error(detail ?? "Couldn't save — is the app still running?");
+    throw new Error(detail ?? "Couldn't save. Is the app still running?");
   }
   return res.json();
 }
