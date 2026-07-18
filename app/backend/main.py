@@ -15,19 +15,27 @@
 import os
 import sys
 import uuid
-from datetime import datetime, timezone
-from typing import Literal, Optional
+from datetime import UTC, datetime
+from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "plugin", "hooks"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from patterns import sweep, redact, BLOCKING_KINDS  # noqa: E402
 import ledger  # noqa: E402
+import security  # noqa: E402
+from patterns import BLOCKING_KINDS, redact, sweep  # noqa: E402
 
-app = FastAPI(title="Nambikkai", docs_url=None, redoc_url=None)
+# Every route depends on the loopback+token guard (see security.py).
+app = FastAPI(
+    title="Nambikkai",
+    docs_url=None,
+    redoc_url=None,
+    dependencies=[Depends(security.guard)],
+)
+security.issue_token(ledger.data_dir())
 
 # Layman words for what the sweep found — kind names never reach a screen.
 KIND_WORDS = {
@@ -47,26 +55,71 @@ class EntryIn(BaseModel):
     cause: str = ""
     helps: str = ""
     body: str = ""
-    privacy_choice: Optional[Literal["keep", "blur"]] = None
+    privacy_choice: Literal["keep", "blur"] | None = None
 
 
-def _chain_state():
+# Response models exist so the OpenAPI schema is real: the frontend's types are
+# GENERATED from it (make api-types), which kills backend/frontend drift as a
+# class rather than by review. FOUNDATIONS add-now item 6.
+class ChainState(BaseModel):
+    ok: bool
+    count: int
+    broken_at: int | None = None
+
+
+class EntryOut(BaseModel):
+    id: str
+    at: str
+    kind: Literal["guided", "free"]
+    feeling: str = ""
+    why: str = ""
+    cause: str = ""
+    helps: str = ""
+    body: str = ""
+    blurred: bool = False
+    src: str = "self"
+    tier: str = "stated"
+    ttl: str = "permanent"
+
+
+class HealthOut(BaseModel):
+    ok: bool
+    chain: ChainState
+
+
+class EntriesOut(BaseModel):
+    entries: list[EntryOut]
+    chain: ChainState
+
+
+class SaveOut(BaseModel):
+    saved: bool
+    # Present when the privacy net wants the user's decision before saving.
+    needs_choice: bool = False
+    found: list[str] = []
+    # Present once the entry is actually in the journal.
+    entry: EntryOut | None = None
+    chain: ChainState | None = None
+
+
+def _chain_state() -> ChainState:
     ok, count, broken = ledger.verify(ledger.ledger_path())
-    return {"ok": ok, "count": count, "broken_at": broken}
+    return ChainState(ok=ok, count=count, broken_at=broken)
 
 
-@app.get("/api/health")
+@app.get("/api/health", response_model=HealthOut)
 def health():
-    return {"ok": True, "chain": _chain_state()}
+    return HealthOut(ok=True, chain=_chain_state())
 
 
-@app.get("/api/entries")
+@app.get("/api/entries", response_model=EntriesOut)
 def list_entries(limit: int = 100):
     records = ledger.read_all(ledger.ledger_path())
-    return {"entries": list(reversed(records))[:limit], "chain": _chain_state()}
+    entries = [EntryOut(**r) for r in list(reversed(records))[:limit]]
+    return EntriesOut(entries=entries, chain=_chain_state())
 
 
-@app.post("/api/entries")
+@app.post("/api/entries", response_model=SaveOut)
 def create_entry(e: EntryIn):
     fields = GUIDED_FIELDS if e.kind == "guided" else ("body",)
     texts = {f: getattr(e, f).strip() for f in fields}
@@ -77,11 +130,11 @@ def create_entry(e: EntryIn):
     found_kinds = {f.kind for f in sweep(combined)} & BLOCKING_KINDS
 
     if found_kinds and e.privacy_choice is None:
-        return {
-            "saved": False,
-            "needs_choice": True,
-            "found": sorted(KIND_WORDS[k] for k in found_kinds),
-        }
+        return SaveOut(
+            saved=False,
+            needs_choice=True,
+            found=sorted(KIND_WORDS[k] for k in found_kinds),
+        )
 
     blurred = bool(found_kinds and e.privacy_choice == "blur")
     if blurred:
@@ -89,7 +142,7 @@ def create_entry(e: EntryIn):
 
     record = {
         "id": uuid.uuid4().hex,
-        "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "at": datetime.now(UTC).isoformat(timespec="seconds"),
         "kind": e.kind,
         **texts,
         "blurred": blurred,
@@ -99,4 +152,4 @@ def create_entry(e: EntryIn):
         "ttl": "permanent",
     }
     rec = ledger.append(ledger.ledger_path(), record)
-    return {"saved": True, "entry": rec, "chain": _chain_state()}
+    return SaveOut(saved=True, entry=EntryOut(**rec), chain=_chain_state())

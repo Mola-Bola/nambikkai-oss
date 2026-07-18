@@ -76,7 +76,9 @@ def run():
         out, _ = c.call("check", {"text": armed})
         kinds = {f["kind"] for f in out["findings"]}
         if case["kind"] not in kinds:
-            fails.append(f"mcp must_mask {case['id']}: expected {case['kind']}, got {kinds or 'nothing'}")
+            fails.append(
+                f"mcp must_mask {case['id']}: expected {case['kind']}, got {kinds or 'nothing'}"
+            )
         raw = json.dumps(out)
         # the armed token must never travel back over the wire; every rule
         # kind carries digits, so the identifier is the longest digit-bearing
@@ -92,7 +94,8 @@ def run():
     for case in data["must_stay"]:
         out, _ = c.call("check", {"text": case["input"]})
         if not out["clean"]:
-            fails.append(f"mcp must_stay {case['id']}: false positive {[f['kind'] for f in out['findings']]}")
+            hits = [f["kind"] for f in out["findings"]]
+            fails.append(f"mcp must_stay {case['id']}: false positive {hits}")
 
     for case in data["known_overmatch"]:
         out, _ = c.call("check", {"text": arm(case["input"])})

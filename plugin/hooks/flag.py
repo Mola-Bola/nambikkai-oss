@@ -19,7 +19,7 @@ import sys
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from patterns import sweep, redact, BLOCKING_KINDS  # noqa: E402
+from patterns import BLOCKING_KINDS, redact, sweep  # noqa: E402
 
 ALERT_LOG = os.environ.get(
     "NAMBIKKAI_LOG", os.path.join(os.getcwd(), ".nambikkai", "alerts.log")
@@ -43,7 +43,11 @@ def last_assistant_text(transcript_path):
             content = msg.get("content", [])
             if isinstance(content, str):
                 return content
-            parts = [b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text"]
+            parts = [
+                b.get("text", "")
+                for b in content
+                if isinstance(b, dict) and b.get("type") == "text"
+            ]
             if parts:
                 return "\n".join(parts)
     return ""

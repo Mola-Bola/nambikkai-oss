@@ -59,10 +59,13 @@ def chain():
 
 
 def api():
+    import security
     from fastapi.testclient import TestClient
     from main import app
 
-    c = TestClient(app)
+    # base_url pins a loopback Host header; the guard rejects anything else.
+    c = TestClient(app, base_url="http://127.0.0.1")
+    c.headers.update({security.TOKEN_HEADER: security.current_token()})
 
     r = c.post("/api/entries", json={"kind": "guided", "feeling": "homesick but lighter"})
     if not (r.status_code == 200 and r.json()["saved"]):
@@ -100,9 +103,37 @@ def api():
         fails.append(f"api: expected unbroken chain of 4, got {chain_state}")
 
 
+def guard():
+    """The localhost guard: a drive-by page must not reach the journal."""
+    import security
+    from fastapi.testclient import TestClient
+    from main import app
+
+    c = TestClient(app, base_url="http://127.0.0.1")
+    good = {security.TOKEN_HEADER: security.current_token()}
+
+    r = c.get("/api/entries")  # no token at all
+    if r.status_code != 401:
+        fails.append(f"guard: tokenless request must 401, got {r.status_code}")
+
+    r = c.get("/api/entries", headers={security.TOKEN_HEADER: "guessed-token"})
+    if r.status_code != 401:
+        fails.append(f"guard: wrong token must 401, got {r.status_code}")
+
+    # DNS-rebinding shape: right token, but Host is the attacker's domain.
+    r = c.get("/api/entries", headers={**good, "host": "attacker.example"})
+    if r.status_code != 403:
+        fails.append(f"guard: non-loopback Host must 403, got {r.status_code}")
+
+    r = c.get("/api/entries", headers=good)
+    if r.status_code != 200:
+        fails.append(f"guard: the app's own request must pass, got {r.status_code}")
+
+
 def main():
     chain()
     api()
+    guard()
     if fails:
         for f in fails:
             print(f"FAIL  {f}")

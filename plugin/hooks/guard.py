@@ -26,8 +26,8 @@ import sys
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from patterns import sweep, redact, BLOCKING_KINDS, WARN_KINDS  # noqa: E402
 import classifier  # noqa: E402  (opt-in second tier; inert unless NAMBIKKAI_CLASSIFIER=1)
+from patterns import BLOCKING_KINDS, redact, sweep  # noqa: E402
 
 ALERT_LOG = os.environ.get(
     "NAMBIKKAI_LOG", os.path.join(os.getcwd(), ".nambikkai", "alerts.log")
@@ -127,7 +127,6 @@ def main():
 
     kinds = {f.kind for f in findings}
     blocking = kinds & BLOCKING_KINDS
-    warning = kinds & WARN_KINDS
     masked = redact(text)
     # a short masked window around the first finding, for the log/message
     sample = masked[:160].replace("\n", " ")

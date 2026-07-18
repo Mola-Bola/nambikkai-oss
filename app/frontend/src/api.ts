@@ -1,38 +1,22 @@
-// Typed client for the local API. Everything talks to 127.0.0.1 — nothing else.
+// Typed client for the local API. Everything talks to 127.0.0.1, nothing else.
+//
+// The types below are DERIVED from api-types.ts, which is generated from
+// FastAPI's OpenAPI schema (`make api-types`). Don't hand-edit shapes here: if
+// the backend renames a field, regenerating makes this file fail to compile,
+// which is the entire point (FOUNDATIONS item 6).
+import type { components } from "./api-types";
 
-export type EntryKind = "guided" | "free";
+export type Entry = components["schemas"]["EntryOut"];
+export type ChainState = components["schemas"]["ChainState"];
+export type EntryDraft = components["schemas"]["EntryIn"];
+export type SaveResult = components["schemas"]["SaveOut"];
+export type EntriesResult = components["schemas"]["EntriesOut"];
+export type EntryKind = EntryDraft["kind"];
 
-export interface Entry {
-  id: string;
-  at: string; // UTC ISO
-  kind: EntryKind;
-  feeling?: string;
-  why?: string;
-  cause?: string;
-  helps?: string;
-  body?: string;
-  blurred: boolean;
+async function readError(res: Response, fallback: string): Promise<string> {
+  const detail = (await res.json().catch(() => null))?.detail;
+  return typeof detail === "string" ? detail : fallback;
 }
-
-export interface ChainState {
-  ok: boolean;
-  count: number;
-  broken_at: number | null;
-}
-
-export interface EntryDraft {
-  kind: EntryKind;
-  feeling: string;
-  why: string;
-  cause: string;
-  helps: string;
-  body: string;
-  privacy_choice?: "keep" | "blur";
-}
-
-export type SaveResult =
-  | { saved: true; entry: Entry; chain: ChainState }
-  | { saved: false; needs_choice: true; found: string[] };
 
 export async function saveEntry(draft: EntryDraft): Promise<SaveResult> {
   const res = await fetch("/api/entries", {
@@ -41,14 +25,15 @@ export async function saveEntry(draft: EntryDraft): Promise<SaveResult> {
     body: JSON.stringify(draft),
   });
   if (!res.ok) {
-    const detail = (await res.json().catch(() => null))?.detail;
-    throw new Error(detail ?? "Couldn't save. Is the app still running?");
+    throw new Error(await readError(res, "Couldn't save. Is the app still running?"));
   }
   return res.json();
 }
 
-export async function listEntries(): Promise<{ entries: Entry[]; chain: ChainState }> {
+export async function listEntries(): Promise<EntriesResult> {
   const res = await fetch("/api/entries");
-  if (!res.ok) throw new Error("Couldn't load your journal.");
+  if (!res.ok) {
+    throw new Error(await readError(res, "Couldn't load your journal."));
+  }
   return res.json();
 }

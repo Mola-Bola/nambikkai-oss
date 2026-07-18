@@ -1,0 +1,54 @@
+[project]
+name = "nambikkai"
+version = "0.2.0"
+description = "A journal that keeps receipts, and keeps them yours. Local-first."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "httpx>=0.27",
+]
+
+[dependency-groups]
+dev = [
+    # uv lives in the venv rather than globally: this machine has no system uv,
+    # and vendoring it here keeps `make` working without touching the OS.
+    "uv>=0.11",
+    "ruff>=0.9",
+    "pre-commit>=4.0",
+]
+
+# An application, not a library: nothing here gets built or published.
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["corpus-data", ".venv"]
+
+[tool.ruff.lint]
+# FOUNDATIONS item 3 rule pack: pycodestyle, pyflakes, isort, pyupgrade,
+# bugbear, simplify.
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# THE ENGINE RUNS ON THE SYSTEM INTERPRETER, NOT THIS VENV. plugin/hooks/* are
+# Claude Code hooks invoked as `python3 <hook>.py` (3.9 on this machine), and
+# the corpus suites are documented as `python3 tests/test_guard.py`. Rules that
+# rewrite to newer-Python syntax must not touch them: UP017 (datetime.UTC) once
+# already broke the redaction gate this way, caught only by the golden corpus.
+# The app (app/backend, tests/test_app.py) runs 3.13 and takes the upgrades.
+"plugin/hooks/*.py" = ["UP006", "UP007", "UP017", "UP035", "UP045"]
+"mcp/*.py" = ["UP006", "UP007", "UP017", "UP035", "UP045"]
+"tests/test_guard.py" = ["E402", "UP006", "UP007", "UP017", "UP035", "UP045"]
+"tests/test_mcp.py" = ["E402", "UP006", "UP007", "UP017", "UP035", "UP045"]
+
+# The engine and app deliberately sys.path.insert before importing siblings;
+# these files stay runnable as plain scripts with no install step.
+"tests/*.py" = ["E402"]
+"app/backend/*.py" = ["E402"]
+# The MCP tool descriptions are contract text read by clients; wrapping those
+# string literals to satisfy a column limit adds diff noise and risks changing
+# what the tools advertise. New code still holds the 100-char line.
+"mcp/server.py" = ["E402", "E501"]

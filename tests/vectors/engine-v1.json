@@ -1,0 +1,77 @@
+{
+  "_comment": [
+    "FROZEN CONTRACT — engine-v1 (docs/spec/engine-v1.md). Any port of the engine",
+    "must reproduce these byte-for-byte. Do NOT regenerate these values to make a",
+    "failing test pass: a mismatch means the hash rule changed, which invalidates",
+    "every chain already written. That is an engine-v2 conversation, not an edit.",
+    "",
+    "AT-REST RULE: redaction inputs carry the '~~' splitter so no matchable",
+    "identifier sits literally in this repo; tests strip it at runtime (arm())."
+  ],
+  "genesis_source": "nambikkai:journal:v1",
+  "genesis_prev": "baf825562c07a059d0b685fc0d9ee3353bbb0174f6725cff8d8b2b048486dcc2",
+  "chain": [
+    {
+      "note": "free entry, ascii",
+      "input": {
+        "id": "vec-0001",
+        "at": "2026-01-01T00:00:00+00:00",
+        "kind": "free",
+        "body": "first"
+      },
+      "prev": "baf825562c07a059d0b685fc0d9ee3353bbb0174f6725cff8d8b2b048486dcc2",
+      "hash": "9d0c8a59c5d322043b3d81e18c49ac150ab5ece39b744d5926f1d5945da91325"
+    },
+    {
+      "note": "guided entry, four fields, tests key ordering in canonical json",
+      "input": {
+        "id": "vec-0002",
+        "at": "2026-01-02T00:00:00+00:00",
+        "kind": "guided",
+        "feeling": "steady",
+        "why": "slept",
+        "cause": "the dog",
+        "helps": "a walk"
+      },
+      "prev": "9d0c8a59c5d322043b3d81e18c49ac150ab5ece39b744d5926f1d5945da91325",
+      "hash": "5ae110a93be3bc927cbf7d7ac2b73eb2af4ada2389b443c38572c02a9d23cd8a"
+    },
+    {
+      "note": "non-ascii body: ensure_ascii=False must be preserved by any port",
+      "input": {
+        "id": "vec-0003",
+        "at": "2026-01-03T00:00:00+00:00",
+        "kind": "free",
+        "body": "unicode holds: நம்பிக்கை"
+      },
+      "prev": "5ae110a93be3bc927cbf7d7ac2b73eb2af4ada2389b443c38572c02a9d23cd8a",
+      "hash": "692c7ada67c856d73e3887f89ba1e0ddff841990c279818697ea6fa90f8dce7c"
+    }
+  ],
+  "redaction": [
+    {
+      "note": "AU mobile keeps first four digits",
+      "input": "call me on 04~~02 123 456 when you land",
+      "expect_kinds": ["phone"],
+      "blocking": true
+    },
+    {
+      "note": "long card number keeps last four only",
+      "input": "deposit went on 4111 1111~~ 1111 1111 today",
+      "expect_kinds": ["account"],
+      "blocking": true
+    },
+    {
+      "note": "SG NRIC/FIN shape",
+      "input": "the form wanted S12~~34567D again",
+      "expect_kinds": ["nric"],
+      "blocking": true
+    },
+    {
+      "note": "ordinary journal prose must survive untouched",
+      "input": "mum called about the garden, felt lighter after",
+      "expect_kinds": [],
+      "blocking": false
+    }
+  ]
+}

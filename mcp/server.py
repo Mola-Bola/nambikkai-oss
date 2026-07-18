@@ -29,7 +29,7 @@ from datetime import date, datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "plugin", "hooks"))
-from patterns import sweep, redact, RULES, BLOCKING_KINDS  # noqa: E402
+from patterns import BLOCKING_KINDS, RULES, redact, sweep  # noqa: E402
 
 SERVER_INFO = {"name": "nambikkai-trust-gate", "version": "0.2.0"}
 VALID_TIERS = {"firm", "stated", "inferred", "hunch"}

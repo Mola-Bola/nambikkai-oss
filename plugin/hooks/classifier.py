@@ -52,7 +52,8 @@ Empty list if nothing matches. Be conservative: flag only clear cases."""
 
 
 def enabled() -> bool:
-    return os.environ.get("NAMBIKKAI_CLASSIFIER", "").lower() in {"1", "true", "yes", "warn", "block"}
+    setting = os.environ.get("NAMBIKKAI_CLASSIFIER", "").lower()
+    return setting in {"1", "true", "yes", "warn", "block"}
 
 
 def block_mode() -> bool:

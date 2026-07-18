@@ -31,7 +31,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 HOOKS = os.path.join(ROOT, "plugin", "hooks")
 sys.path.insert(0, HOOKS)
-from patterns import sweep, is_clean  # noqa: E402
+from patterns import is_clean, sweep  # noqa: E402
 
 CASES = os.path.join(ROOT, "corpus", "cases.json")
 GUARD = os.path.join(HOOKS, "guard.py")
@@ -132,6 +132,7 @@ def classifier_tier():
     # process and drive classifier_pass directly. Block mode refuses, warn
     # tier doesn't, the override downgrades — no API involved.
     import io
+
     import classifier as clf
     import guard
     orig_classify, orig_log, orig_override = clf.classify, guard.ALERT_LOG, guard.OVERRIDE

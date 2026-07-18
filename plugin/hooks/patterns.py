@@ -10,7 +10,8 @@
 # regional packs land as corpus PRs (a rule without cases doesn't merge).
 # ============================================================================
 import re
-from typing import Callable, NamedTuple
+from collections.abc import Callable
+from typing import NamedTuple
 
 # Overmatch-prone kinds (see evals/redaction known_overmatch O-01..O-04): plain
 # dates and any 6+ mixed-alnum token trip these. The gate WARNS on them (logs,
@@ -71,7 +72,7 @@ def _resolve_matches(text: str):
     all_m.sort(key=lambda t: (t[0], t[1]))
     kept = []
     cursor = -1
-    for start, priority, end, kind, value, mask in all_m:
+    for start, _priority, end, kind, value, mask in all_m:
         if start >= cursor:
             kept.append((start, end, kind, value, mask))
             cursor = end
@@ -89,7 +90,7 @@ def redact(text: str) -> str:
     if not matches:
         return text
     out, last = "", 0
-    for start, end, kind, value, mask in matches:
+    for start, end, _kind, value, mask in matches:
         out += text[last:start] + mask(value)
         last = end
     return out + text[last:]

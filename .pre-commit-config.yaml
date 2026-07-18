@@ -1,0 +1,32 @@
+# Nambikkai pre-commit (FOUNDATIONS add-now item 3).
+#
+# ruff runs from this repo's .venv rather than a pre-commit-managed copy, so the
+# hook and `make lint` can never disagree about which version judged the code.
+# Remove the hook any time with: .venv/bin/pre-commit uninstall
+#
+# corpus-data/ is licensed third-party research data and its docs are provenance
+# records — formatters must not rewrite them (licence hygiene). Logs and the
+# journal's own data are runtime artefacts, equally off-limits.
+exclude: '^(corpus-data/|data/|(internal note, not published)*\.log$|.*\.lock$)'
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-toml
+      # A journal's data must never be committed, however small the slip.
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        entry: .venv/bin/ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
