@@ -111,6 +111,60 @@ moment it's relevant. Three decisions fix its shape.
 - **Good-news feed:** objectively good news only — restoration-of-faith good, not
   counter-negative good ("war ended" ≠ the bar; "thing got genuinely better" is).
 
+## Folded from life-os — proven there, adopted here (owner, 2026-07-19)
+_life-os is the R&D bench; these patterns earned their keep in daily use. Folded as product
+direction — each still lands through its own charter, none silently jumps the sequencing
+at the bottom of this file._
+
+- **Capture-anywhere (the biggest proven win).** life-os's highest-volume, most-durable loop
+  is zero-friction phone capture: write plainly, and the *place* you write decides what
+  it is (the Journal room needs no prefix — place over prefix; the 7-topics→4-rooms
+  simplification). The journal needs its own capture surface beyond the browser,
+  phone-first, no grammar for the default case. This promotes the charter's parked
+  "Telegram bridge" from OUT to **first post-MVP charter candidate** — slot before or
+  alongside habits, owner's call (flagged, not silently resequenced). Evidence: 100+
+  captures/day on flood days; capture held even on days everything else slipped.
+- **Promote-to-truth (the life-os-save pattern).** life-os's lesson: good synthesis dies in the
+  chat it was written in unless promoted back into the spine. The journal's version: one
+  gesture from any entry or reflection answer — "keep this as a truth" — drafts a truth
+  (dated, provenance attached) for the user to confirm or edit. The user's tap writes it;
+  nothing auto-files.
+- **The engine room made visible (Keeper's-Note + Freehold patterns).** For a product
+  whose brand is trust, the engine's own receipts deserve a surface: what ran locally
+  (imports, index rebuilds, backups) and the network doors — "zero outbound calls this
+  session, verified" as a live check, not a promise in copy. Machine words about the
+  MACHINE are fine; the line stays absolute for words about the person.
+- **Backups where silence is a finding.** life-os's vault backup failed six nights running
+  for a dumb reason (the Mac was asleep) and only a liveness meter caught it. Nambikkai's
+  backup story (currently manual) adopts the rule: scheduled local backup + a liveness
+  check where "the job didn't run" surfaces as loudly as "the job failed". Sleep-aware
+  scheduling from day one.
+- **Question discipline for loose ends (the Mailbox clarify-loop).** Uncertainty-gated,
+  hard-capped per sitting (life-os caps 2 per batch), always dismissible, never re-asked in
+  the same breath. M4's loose-end popups adopt the cap as doctrine — today's 12-question
+  demo guard becomes a product rule with a real (smaller) number.
+- **Notification doctrine, if reminders ever ship (the Butler pattern).** Quiet hours · a
+  hard daily cap · user-set loudness classes · a dismissal is permanent. Second-horizon
+  reminders inherit this shape; "gentle" is a mechanism, not a tone.
+- **A return ritual, pull-first (the briefs pattern, inverted).** life-os's morning/evening
+  briefs prove cadence compounds. The journal's version must obey ADR 003: an opt-in
+  weekly "look back" assembled ONLY from the user's own words (entries returned, truths
+  that changed, on-this-day), surfaced as a quiet marker on open — never a push, never a
+  summary in the machine's voice. This is also where the reflection loop's
+  "feedback doubles the effect" science gets its cadence.
+
+### Looked at in life-os, deliberately NOT folded
+- **Brain-power-style scores on the person.** A number grading the user's inner life
+  violates the first principle outright. Engine health may have a meter; the person
+  never does (the owner's own operator-meter idea stays a life-os experiment, not a product
+  feature, unless it re-enters as pure self-report the user authors).
+- **Push briefs / proactive messages into the user's day.** life-os's owner opted in as an
+  operator; a journal user didn't. Pull stays the default (ADR 003).
+- **The daemon fleet / supervisor complexity.** life-os needs it; a single local app doesn't.
+  Every moving part spends trust budget.
+- **Cost/token metering surfaces.** Tier 1 makes no runtime API calls; there is nothing
+  to meter and nothing to show.
+
 ## Third horizon (bigger bets, need design)
 - **Group-chat companion:** an opt-in bot deployed into shared chats (friends/family/colleagues)
   recording sentiments and life events, feeding each linked member's own journal.
