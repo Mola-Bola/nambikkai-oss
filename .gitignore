@@ -26,3 +26,4 @@ corpus-data/**
 
 # converted demo diaries: built from gitignored corpus-data, never committed
 /build/
+_extractions/
