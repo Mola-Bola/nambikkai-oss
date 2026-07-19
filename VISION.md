@@ -179,6 +179,8 @@ at the bottom of this file._
 - **Identity:** publish under a **separate org identity** — new GitHub org + email on the
   nambikkai domains. The doctrine's "identity door" opens; personal accounts stay
   isolated, no leak crossover. The `[publisher TBD]` in PITCH/README resolves to the org.
+  **Org created 2026-07-19: `github.com/<org>`** (email spine live on
+  engine.example via Cloudflare catch-all → org inbox).
 - **First wave (publishable from the current repo):** landing pages on both domains ·
   the trust-gate MCP server (check/redact/tag_fact/lint, stdlib-only, corpus-bound) ·
   the Claude Code plugin + skills (redaction gate, incident-to-eval, provenance-lint).
