@@ -172,6 +172,33 @@ at the bottom of this file._
   location…) so people find truths general or near to their lives. **Bot-free as much as
   possible — feeds are populated by humans.**
 
+## Going public — domains, identity, first wave (owner, 2026-07-19)
+- **Domains bought:** `journal.example` = the journal (human-facing, layman copy, warm) ·
+  `engine.example` = the engine room (trust gate, MCP server, provenance spec, builder
+  docs). Split confirmed by the owner.
+- **Identity:** publish under a **separate org identity** — new GitHub org + email on the
+  nambikkai domains. The doctrine's "identity door" opens; personal accounts stay
+  isolated, no leak crossover. The `[publisher TBD]` in PITCH/README resolves to the org.
+- **First wave (publishable from the current repo):** landing pages on both domains ·
+  the trust-gate MCP server (check/redact/tag_fact/lint, stdlib-only, corpus-bound) ·
+  the Claude Code plugin + skills (redaction gate, incident-to-eval, provenance-lint).
+- **Queued behind it (a real job, days not hours):** extract + scrub the Telegram
+  machinery from life-os (rooms / session broker / butler / triage / thread-aware I/O) into a
+  standalone publishable component. It lives tangled in personal infra today; extraction
+  goes through the perimeter + a red-team pass before any flip.
+- **Claims discipline binds the public surface:** state plainly what's built (egress
+  perimeter, not input; recall limits published); the weekly audit red-teams the public
+  repos before and after each flip. Nothing overclaims — trust is the brand.
+
+## Velocity doctrine (owner, 2026-07-19)
+- **Charter mode.** The owner approves a charter's goal once; sessions build it
+  end-to-end with NO per-stone check-ins. Tests + goldens are the gate, not nods.
+- **Session close = a ≤10-line delta in STATUS.** No narratives, no word-vomit recaps.
+  The owner reads deltas async and steers by exception.
+- **NOT loosened:** the product's own privacy doctrine (stage-only autonomy for the
+  app's agents, no machine feeling-labels), remote push, and public flips — those three
+  stay on the owner's word, always.
+
 ## Open tensions (to reason through, not resolve by default)
 - **T1 · Names vs roles.** The engine's doctrine is people-by-role / identity non-retention
   (born from the builder's own privacy bar). The product vision says users may use real names.
