@@ -186,6 +186,15 @@ at the bottom of this file._
   machinery from life-os (rooms / session broker / butler / triage / thread-aware I/O) into a
   standalone publishable component. It lives tangled in personal infra today; extraction
   goes through the perimeter + a red-team pass before any flip.
+- **Standalone-extraction doctrine (owner, 2026-07-19).** The working repos (this one and
+  ~/life-os) are the TEST GROUND — nothing ever publishes from them directly, and neither repo
+  ever flips public. Every public component is a clean-room extraction into its own repo
+  under the org: **fresh git history** (no inherited commits — old history can carry
+  personal paths and mistakes), its own CI, its own copy of the corpus binding (the corpus
+  is synthetic, so it travels), versioned releases, LICENSE, and a red-team pass before
+  the first flip and each release. The test ground then consumes the published package
+  back as a dependency where practical — so what we ship is what we ourselves run, one
+  version behind the bleeding edge, never the bleeding edge itself.
 - **Claims discipline binds the public surface:** state plainly what's built (egress
   perimeter, not input; recall limits published); the weekly audit red-teams the public
   repos before and after each flip. Nothing overclaims — trust is the brand.
