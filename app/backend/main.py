@@ -33,7 +33,7 @@ import index as relevance  # noqa: E402
 import ledger  # noqa: E402
 import security  # noqa: E402
 import store  # noqa: E402
-from patterns import BLOCKING_KINDS, redact, sweep  # noqa: E402
+from patterns import BLOCKING_KINDS, PROMPT_KINDS, redact, sweep  # noqa: E402
 
 # Every route depends on the loopback+token guard (see security.py).
 app = FastAPI(
@@ -50,6 +50,9 @@ KIND_WORDS = {
     "passport": "a passport number",
     "phone": "a phone number",
     "account": "a card or account number",
+    "ssn": "a tax or social security number",
+    "iban": "a bank account number",
+    "email": "an email address",
 }
 
 GUIDED_FIELDS = ("feeling", "why", "cause", "helps")
@@ -388,7 +391,9 @@ def create_entry(e: EntryIn):
         raise HTTPException(400, "Nothing to keep yet. Write a little first.")
 
     combined = "\n".join(v for v in texts.values() if v)
-    found_kinds = {f.kind for f in sweep(combined)} & BLOCKING_KINDS
+    # PROMPT_KINDS, not BLOCKING_KINDS: the save-time question is cheap, so it
+    # also covers email. Imports (below) still auto-blur on blocking kinds only.
+    found_kinds = {f.kind for f in sweep(combined)} & PROMPT_KINDS
 
     if found_kinds and e.privacy_choice is None:
         return SaveOut(

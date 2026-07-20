@@ -109,9 +109,13 @@ by `corpus/cases.json` — that corpus, not this document, is the authority on
 - `redact(text)` partial-masks in place; output length may differ from input.
 - **Overlap resolution:** all rules match against the original text; earliest
   start wins; ties break by rule order in `RULES` (earlier = higher priority).
-- `BLOCKING_KINDS = {nric, passport, phone, account}` (high confidence — these
-  drive the app's blur/keep prompt). `WARN_KINDS = {dob, brokerage}` (overmatch-
-  prone — logged, never blocking).
+- `BLOCKING_KINDS = {nric, passport, phone, account, ssn, iban}` (high
+  confidence — the gate refuses egress outright). `WARN_KINDS = {dob, brokerage,
+  email, ip, geo}` (overmatch-prone or routine in technical payloads — logged,
+  never blocking; email lives here because blocking it would halt ordinary dev
+  work such as commit trailers). `PROMPT_KINDS = BLOCKING_KINDS ∪ {email}`
+  drives the app's save-time blur/keep question, where asking is cheap; imports
+  and the demo loader auto-blur on `BLOCKING_KINDS` only.
 - Masks are deterministic: the same input always yields the same masked output.
 
 ## 5 · What a port must pass

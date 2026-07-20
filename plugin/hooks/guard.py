@@ -4,11 +4,12 @@
 #
 # Runs the detection rules over a tool call's payload BEFORE it executes.
 # - BLOCKS (exit 2) when a high-confidence identifier (NRIC/passport/phone/
-#   account) would be written to a file, passed to a shell, or sent to an MCP
-#   connector. Enforcement lives at the harness boundary — the app never has
-#   to remember to call a library.
-# - WARNS (logs, allows) on overmatch-prone kinds (dob/brokerage) so routine
-#   dates and codes don't halt work (see corpus known_overmatch).
+#   account/SSN/IBAN) would be written to a file, passed to a shell, or sent
+#   to an MCP connector. Enforcement lives at the harness boundary — the app
+#   never has to remember to call a library.
+# - WARNS (logs, allows) on overmatch-prone or routine kinds (dob/brokerage/
+#   email/ip/geo) so dates, commit trailers and codes don't halt work (see
+#   corpus known_overmatch and the posture notes in patterns.py).
 #
 # Override: set NAMBIKKAI_ALLOW_RAW=1 to downgrade a block to a logged warning
 # (explicit, auditable — e.g. deliberately writing a real value into your

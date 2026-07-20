@@ -60,6 +60,66 @@
       "kind": "brokerage",
       "input": "wire ref AB12~~CD34EF from the broker",
       "note": "mixed alnum ≥6"
+    },
+    {
+      "id": "R-11",
+      "kind": "email",
+      "input": "email me at mira.k89@exam~~ple.com if it flares",
+      "note": "email — warn tier at the gate, prompt tier in the app"
+    },
+    {
+      "id": "R-12",
+      "kind": "ssn",
+      "input": "SSN on the W-2 reads 536-2~~2-8121",
+      "note": "US SSN, dashed form only (bare 9 digits would overmatch)"
+    },
+    {
+      "id": "R-13",
+      "kind": "phone",
+      "input": "whatsapp +61 4~~12 345 678 anytime",
+      "note": "intl phone, +cc space-grouped"
+    },
+    {
+      "id": "R-14",
+      "kind": "phone",
+      "input": "viber +9198~~76543210 works too",
+      "note": "intl phone, +cc compact"
+    },
+    {
+      "id": "R-15",
+      "kind": "phone",
+      "input": "call the clinic on (415) 5~~55-2671",
+      "note": "US phone, paren-anchored form"
+    },
+    {
+      "id": "R-16",
+      "kind": "iban",
+      "input": "rent goes to DE89 3704~~ 0044 0532 0130 00 monthly",
+      "note": "IBAN, 4-grouped with country anchor"
+    },
+    {
+      "id": "R-17",
+      "kind": "iban",
+      "input": "IBAN GB29NW~~BK60161331926819 on the invoice",
+      "note": "IBAN, compact"
+    },
+    {
+      "id": "R-18",
+      "kind": "dob",
+      "input": "born 1989-0~~3-14 per the form",
+      "note": "ISO date joins the dob warn tier"
+    },
+    {
+      "id": "R-19",
+      "kind": "ip",
+      "input": "router sits on 192.168~~.1.1 at home",
+      "note": "IPv4 — warn tier"
+    },
+    {
+      "id": "R-20",
+      "kind": "geo",
+      "input": "pinned -33.86~~88, 151.2093 on the map",
+      "note": "precise geo pair, ≥3 decimals each — warn tier"
     }
   ],
   "must_stay": [
@@ -90,6 +150,22 @@
     {
       "id": "C-07",
       "input": "open follow-ups held at a target of 5"
+    },
+    {
+      "id": "C-08",
+      "input": "the semver jumped from 2.6 to 2.10 this week"
+    },
+    {
+      "id": "C-09",
+      "input": "sum came to 1,234.56 plus 987.65 in fees"
+    },
+    {
+      "id": "C-10",
+      "input": "ping the channel @here when the build is green"
+    },
+    {
+      "id": "C-11",
+      "input": "meeting moved to 4-6 pm on the 12th"
     }
   ],
   "known_overmatch": [
@@ -116,6 +192,18 @@
       "kind": "brokerage",
       "input": "tracking COVI~~D19 tail effects",
       "note": "any ≥6 mixed-alnum token matches brokerage"
+    },
+    {
+      "id": "O-05",
+      "kind": "ip",
+      "input": "bumped the dep to 10.2.1~~4.3 in the lockfile",
+      "note": "four-part version strings share the IPv4 shape; warn tier, safe direction"
+    },
+    {
+      "id": "O-06",
+      "kind": "dob",
+      "input": "sprint ends 2026-0~~8-14 per the board",
+      "note": "ANY ISO date masks to YYYY-MM — plain dates lose the day, same as O-03"
     }
   ],
   "known_gap": [
@@ -146,6 +234,11 @@
       "input": "the payor shown was Tavish Anand s/o Kuppusamy",
       "note": "synthetic legal name w/ patronymic; role-based rule (Claude-side) is the only net",
       "classifier": "expected"
+    },
+    {
+      "id": "G-05",
+      "input": "dialled 555-12~~3-4567 about the refund",
+      "note": "bare dashed US phone passes — the shape collides with part/serial numbers; anchored forms ((415) …, +1 …) do catch"
     }
   ]
 }

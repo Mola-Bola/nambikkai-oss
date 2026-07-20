@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ============================================================================
-# Nambikkai trust-gate MCP server (v0.2) — the same perimeter, for any client.
+# Nambikkai trust-gate MCP server (v0.3) — the same perimeter, for any client.
 #
 # A dependency-free stdio MCP server exposing the Nambikkai engine to anything
 # that speaks MCP — not just Claude Code. It does NOT fork the rules: it
@@ -31,7 +31,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "plugin", "hooks"))
 from patterns import BLOCKING_KINDS, RULES, redact, sweep  # noqa: E402
 
-SERVER_INFO = {"name": "nambikkai-trust-gate", "version": "0.2.0"}
+SERVER_INFO = {"name": "nambikkai-trust-gate", "version": "0.3.0"}
 VALID_TIERS = {"firm", "stated", "inferred", "hunch"}
 TTL_RE = re.compile(r"^(evergreen|permanent|expired|\d+mo|\d+d|review:\d{4}-\d{2}|—)$")
 RECEIPT_RE = re.compile(r"\[src:\s*([^|\]]*)\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)\]")
