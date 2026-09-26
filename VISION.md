@@ -2,7 +2,10 @@
 
 _Owner's working vision, captured 2026-07-17. Explicitly NOT gospel — evolving, to be reasoned
 with. Sessions: read this before proposing anything. When the owner adds or revises a point,
-update THIS file — roadmap thoughts do not live in chat or life-os handoffs anymore._
+update THIS file — roadmap thoughts do not live in chat or side notes anymore._
+
+_Public-copy note: "life-os" below is the author's private personal-operations system, the R&D bench
+this journal grew out of. It is not part of this repository._
 
 ## The product in one line
 A journal that maps what you feel, who shaped it, and what you've concluded about them —
@@ -43,7 +46,7 @@ keeping receipts so the picture of your life stays honest and revisable.
   to nature, to one another, to ourselves. Nambikkai exists to restore that: nambikkai in
   themselves, in others, in the world.
 - **The builder's own story moves the platform.** From life-os, the work with AI, where that took
-  him — that arc (how Nambikkai started, shifted, and where it's headed) is the narrative spine
+  the builder — that arc (how Nambikkai started, shifted, and where it's headed) is the narrative spine
   for telling the product's story. Not needed now; never forgotten.
 
 ## Core loops (MVP horizon)
@@ -172,34 +175,26 @@ at the bottom of this file._
   location…) so people find truths general or near to their lives. **Bot-free as much as
   possible — feeds are populated by humans.**
 
-## Going public — domains, identity, first wave (owner, 2026-07-19)
-- **Domains bought:** `journal.example` = the journal (human-facing, layman copy, warm) ·
-  `engine.example` = the engine room (trust gate, MCP server, provenance spec, builder
-  docs). Split confirmed by the owner.
-- **Identity:** publish under a **separate org identity** — new GitHub org + email on the
-  nambikkai domains. The doctrine's "identity door" opens; personal accounts stay
-  isolated, no leak crossover. The `[publisher TBD]` in PITCH/README resolves to the org.
-  **Org created 2026-07-19: `github.com/<org>`** (email spine live on
-  engine.example via Cloudflare catch-all → org inbox).
-- **First wave (publishable from the current repo):** landing pages on both domains ·
+## Going public — first wave and extraction doctrine (owner, 2026-07-19)
+- **Two faces:** a human-facing site for the journal (layman copy, warm) and a builder-facing
+  site for the engine room (trust gate, MCP server, provenance spec). Publish under a
+  project identity, kept separate from personal accounts.
+- **First wave (publishable from the current repo):** landing pages ·
   the trust-gate MCP server (check/redact/tag_fact/lint, stdlib-only, corpus-bound) ·
   the Claude Code plugin + skills (redaction gate, incident-to-eval, provenance-lint).
-- **Queued behind it (a real job, days not hours):** extract + scrub the Telegram
-  machinery from life-os (rooms / session broker / butler / triage / thread-aware I/O) into a
-  standalone publishable component. It lives tangled in personal infra today; extraction
-  goes through the perimeter + a red-team pass before any flip.
-- **Standalone-extraction doctrine (owner, 2026-07-19).** The working repos (this one and
-  ~/life-os) are the TEST GROUND — nothing ever publishes from them directly, and neither repo
-  ever flips public. Every public component is a clean-room extraction into its own repo
-  under the org: **fresh git history** (no inherited commits — old history can carry
-  personal paths and mistakes), its own CI, its own copy of the corpus binding (the corpus
-  is synthetic, so it travels), versioned releases, LICENSE, and a red-team pass before
-  the first flip and each release. The test ground then consumes the published package
-  back as a dependency where practical — so what we ship is what we ourselves run, one
-  version behind the bleeding edge, never the bleeding edge itself.
+- **Queued behind it (a real job, days not hours):** extract + scrub the chat-capture
+  machinery from life-os into a standalone publishable component. It lives tangled in
+  personal infra today; extraction goes through the perimeter + a red-team pass before any flip.
+- **Standalone-extraction doctrine (owner, 2026-07-19).** The working repos are the TEST
+  GROUND — nothing publishes from them directly. Every public component is a clean-room
+  extraction into its own repo: scrubbed git history (old history can carry personal paths
+  and mistakes), its own CI, its own copy of the corpus binding (the corpus is synthetic, so
+  it travels), versioned releases, LICENSE, and a red-team pass before the first flip and
+  each release. The test ground then consumes the published package back as a dependency
+  where practical — so what we ship is what we ourselves run.
 - **Claims discipline binds the public surface:** state plainly what's built (egress
-  perimeter, not input; recall limits published); the weekly audit red-teams the public
-  repos before and after each flip. Nothing overclaims — trust is the brand.
+  perimeter, not input; recall limits published); red-team the public repos before and
+  after each flip. Nothing overclaims — trust is the brand.
 
 ## Velocity doctrine (owner, 2026-07-19)
 - **Charter mode.** The owner approves a charter's goal once; sessions build it

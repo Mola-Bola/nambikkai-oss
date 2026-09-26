@@ -55,7 +55,3 @@ keep the broken file aside rather than deleting it.
 Nothing schedules this yet — running `make backup` is currently manual. To make it
 nightly, add a `launchd` job (macOS) or cron entry that runs the script.
 
-**Owner decision outstanding:** FOUNDATIONS suggests confirming whether `~/life-os`'s
-`backup_vault.sh` still covers this path. This repo deliberately does not reach
-into that infrastructure (CLAUDE.md), so wiring the two together is your call, not
-something a session should do unasked.

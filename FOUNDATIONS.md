@@ -13,9 +13,10 @@ checked against this repo's actual state (M2 committed, M3 in flight). Sources l
 - **data/ gitignored** — user words never enter git. Verified.
 
 ## Add NOW (ordered by leverage)
-1. **Session state + handoffs (the gap you asked about):** STATUS.md (short, overwrite-in-place)
-   + docs/handoffs/ per-session notes + a session-close rule in CLAUDE.md ("commit or write a
-   handoff before ending — never leave silent dirty state"). Scaffolded alongside this doc.
+1. **Session state + handoffs (the gap you asked about):** a short overwrite-in-place status file
+   + per-session handoff notes + a session-close rule for agent sessions ("commit or write a
+   handoff before ending — never leave silent dirty state"). Scaffolded alongside this doc
+   (kept out of the public copy: they are working notes, not product).
    Heavier option if this ever feels thin: Beads (git-backed agent task ledger,
    github.com/steveyegge/beads).
 2. **Localhost hardening — privacy brand demands it:** bind 127.0.0.1 only + a per-session token
@@ -26,8 +27,8 @@ checked against this repo's actual state (M2 committed, M3 in flight). Sources l
    consensus default. One `uv run pytest` command that runs everything incl. the corpus.
 4. **Backup + restore for data/:** nightly copy of the JSONL dir (+ `VACUUM INTO` once SQLite
    views exist); test restore ONCE and write the procedure down. Currently journal entries have
-   no backup story at all in this repo (life-os's vault no longer covers this path automatically —
-   verify or add it to backup_vault.sh's include set).
+   no backup story at all in this repo (the author's separate personal backup job no longer
+   covers this path automatically).
 5. **Engine spec + golden vectors freeze:** write the ledger/hash-chain/redaction spec as a doc
    with test vectors. This is cheap insurance: mobile packaging will eventually force a
    Rust/TS engine port (see below), and a frozen spec makes it mechanical, not archaeology.

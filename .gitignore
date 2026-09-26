@@ -14,8 +14,8 @@ __pycache__/
 # corpus-data: research corpora are re-fetchable (pinned records in ACQUISITION-LOG)
 # and carry CC-BY-NC / research-only licences — the DATA never enters git in a
 # maybe-public repo. The docs (acquisition log, licence notes, provenance, dataset
-# cards, mirror READMEs) DO commit. Data dirs are vault-backed via life-os's
-# backup_vault.sh include set (A7 pattern). [2026-07-16 restructure S5]
+# cards, mirror READMEs) DO commit. Data dirs are backed up outside git.
+# [2026-07-16 restructure S5]
 corpus-data/**
 !corpus-data/**/
 !corpus-data/**/*.md

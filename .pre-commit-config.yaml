@@ -7,7 +7,7 @@
 # corpus-data/ is licensed third-party research data and its docs are provenance
 # records — formatters must not rewrite them (licence hygiene). Logs and the
 # journal's own data are runtime artefacts, equally off-limits.
-exclude: '^(corpus-data/|data/|(internal note, not published)*\.log$|.*\.lock$)'
+exclude: '^(corpus-data/|data/|.*\.lock$)'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

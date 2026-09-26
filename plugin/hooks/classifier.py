@@ -7,7 +7,7 @@
 # the corpus known_gap classes — free-text personal names, bare money amounts,
 # street addresses — the shapes regex is blind to (G-01..G-04).
 #
-# Contract (ops/PROPOSALS.md N-001):
+# Contract (proposal N-001):
 #   - OPT-IN: does nothing unless NAMBIKKAI_CLASSIFIER=1. Off = zero API calls.
 #   - WARN-TIER: findings log + announce, never block. Blocking is a later
 #     opt-in after calibration (judge before dispatch).

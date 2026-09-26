@@ -219,7 +219,7 @@ REVIEWED_EXCEPTIONS = (
     "Nambikkai never tells you what you feel. It asks.",
 )
 
-# Clinical vocabulary. A journal, never therapy (CLAUDE.md, standing doctrine).
+# Clinical vocabulary. A journal, never therapy (VISION.md, standing doctrine).
 CLINICAL = (
     "depress",
     "anxiety disorder",

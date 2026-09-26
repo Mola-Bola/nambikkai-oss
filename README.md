@@ -1,108 +1,164 @@
 # Nambikkai
 
-**The journal that keeps receipts — and keeps them yours.**
+**A local-first journal that keeps receipts.**
 
-Nambikkai is an agentic journal. You tell it what you feel, what set it off, who it
-involves (by role, never by name), and what you believe about it. It keeps those
-beliefs the way an accountant keeps books: every entry carries provenance, every
-belief carries *valid-from* and *valid-to*, and nothing is ever silently rewritten.
-Over time it can show you where an ease or an unease actually stems from — "what I
-believed then" next to "what I know now" — and when something you write sits close to
-something you wrote before, it can put the two side by side, in your own words, for you
-to draw your own conclusion from.
+Nambikkai is a journal app that runs entirely on your own machine. You write what you
+feel, what set it off, who it involves, and what you believe about it. It stores those
+beliefs the way an accountant keeps books: every entry is append-only and hash-chained,
+every belief has a *valid-from* and *valid-to*, and nothing is silently rewritten. When
+something you write sits close to something you wrote before, it can put the two side
+by side, in your own words, so you can draw your own conclusion.
 
-Not a chat app with memory. A ledger of personal truths, with an agent in service of it.
+It is a journal, not therapy. There is no diagnosis or treatment language anywhere in
+the code or the copy, and no machine ever tells the user what they feel.
 
 ---
 
-## Why this exists
+## What is built
 
-Held truths compound like debt. A belief about a person, formed in one bad week and
-never revisited, quietly accrues interest for years — in how you read their messages,
-in what you don't say at dinner. Most journaling apps store *what happened*. None keep
-receipts on *what you believed*, or notice when the belief is stale.
+A working local web app: a FastAPI backend and a React + TypeScript frontend, both bound
+to `127.0.0.1`, with no network calls at runtime.
 
-That's the whole product: **provenance for feelings.** Psychology calls the mechanism
-appraisal — emotions arise largely from what you believe about an event or a person,
-and revising the appraisal revises the feeling. A bitemporal belief ledger is
-reappraisal with receipts. The science on writing it down is real and honest-sized:
-naming a feeling precisely is itself regulating (affect labelling), and the effects of
-expressive writing roughly *double* when the writing gets feedback. The reflection loop
-is our answer to that last part, with one deliberate constraint: the feedback is your
-own earlier writing placed beside the new, never a machine's opinion of it.
-
-And one line we hold everywhere, in copy and in code: **Nambikkai is a journal, never
-therapy.** No diagnosis, no treatment language, anywhere. When the record looks heavy,
-it suggests distance, a walk, a human — warmly, and nothing more.
-
-## Privacy is the first feature
-
-A journal holds the most personal data any agent system will ever touch. So the
-guarantees are architecture, not marketing:
-
-- **Local-first.** Entries live in a ledger on your machine. They never ride a commit,
-  a sync, or anyone's training run. There is no cloud copy to breach.
-- **People by role, never by name.** "The manager", "my spouse" — identity-class
-  values are not retained, mechanically (a vault-side roles map plus a redaction net
-  over every stored field).
-- **Hash-chained entries.** Each row chains to the last. Yesterday's entry can't be
-  quietly rewritten — by you at 2am, by a bug, or by anything else. Receipts are real.
-- **The reflection loop proposes, never acts.** Stage-only autonomy, inherited from
-  the trust layer this journal is built on.
-
-## The engine room (where the trust layer went)
-
-Nambikkai began as the extracted trust layer of a production personal life-OS — a
-redaction gate, a provenance convention, a golden corpus, an MCP server. That layer
-wasn't shelved; it became the journal's invisible core:
-
-| Was (the trust layer) | Is (the journal) |
+| Area | What it does |
 |---|---|
-| Bitemporal receipts `[src \| date \| tier \| ttl]` | Entry & belief provenance — "believed then / known now" |
-| Redaction gate + classifier (the perimeter) | The privacy spine: people-by-role, identity non-retention |
-| The golden corpus + `incident-to-eval` flywheel | The honesty discipline — every guard provably tested, every gap published |
-| Stage-only autonomy convention | The reflection loop's leash — it suggests, you decide |
+| **Capture** | Guided entries (feeling · why · who or what · what helps) or free writing, stored in a hash-chained ledger with provenance on every record. |
+| **People & things** | Anyone or anything can be tracked by alias or name, with "what I thought then" next to "what I think now", and a thread of every entry that mentions them. |
+| **Import** | Paste or drop old journals. Dates are parsed from common formats; names that recur become gentle "who is this?" questions the user can answer or dismiss. |
+| **Truths** | Beliefs about people or situations. A truth is superseded, never edited, so "believed then / know now" is always recoverable. |
+| **You** | Counts, returns after a quiet spell, and one chronological thread of the user's own words. No scores, no mood graph. |
+| **Reflection** | Related past entries shown beside the current one, found by a local embedding model (all-MiniLM-L6-v2 via ONNX + sqlite-vec). Pull, never push. An optional, off-by-default layer can ask a short question a human wrote; it never states a conclusion. |
+| **Demo data** | An invented demo set (and an optional public-domain diary, 531 entries over 13 years), clearly labelled and removable with one button. |
+| **Export** | User-initiated export that swaps names for roles and passes one egress checkpoint. |
 
-The developer-facing pieces still exist and still pass their suites (`plugin/`,
-`mcp/`, `corpus/`, `conventions/` — run `python3 tests/test_guard.py` and
-`tests/test_mcp.py` any time). The dev-tool *positioning* retires; the mechanism is
-now judged by what it protects.
+Underneath the app sits the **trust engine** the project started as:
 
-## Status
+- `plugin/`: a Claude Code plugin whose hooks block or warn when an agent is about to
+  write personal identifiers (ID numbers, bank details, phone numbers, emails, IPs, and
+  more) outside the places they belong. It also ships two skills (`incident-to-eval`,
+  `provenance-lint`).
+- `mcp/`: an MCP server exposing the same gate as tools (`check`, `redact`, `tag_fact`,
+  `lint`). Standard library only.
+- `corpus/`: a golden corpus of synthetic cases that every implementation is tested
+  against: what must be masked, what must be left alone, known false positives, and
+  known misses published as debt rather than hidden.
+- `conventions/`: the provenance receipt format, the trust doctrine, and the
+  "stage-only autonomy" rule (agents propose, people decide).
 
-Local web-app MVP (charter 2026-07-17): a FastAPI backend wrapping the engine, a
-React front, everything on localhost. The builder is user #1; the product generalises
-from what demonstrably works on a real life, not a persona.
+## Run it
 
-- **Capture** — a `journal:` message routes to the chained truth ledger (shipped)
-- **Reflection loop** — weekly, gentle-suggestive, self-distancing by design; drafts
-  reviewed by the owner before a single message sends (in build)
-- **Habit tracker** — gamified for *returning after a gap*, not streak-guilt; built
-  for bad weeks, because those are the weeks the product exists for (after the journal
-  loop earns daily use)
-- **Grounding** — calibration only against licensed research corpora (ISEAR,
-  Covid-ED, GoEmotions, EmpatheticDialogues) behind a binding ethics gate: no scraped
-  blogs, nothing regurgitated, and user entries never leave the local spine for
-  training
+Requirements: macOS or Linux, Python 3.11+ (3.13 preferred), Node 20+, `make`.
 
-## What's in the box
+```bash
+make dev          # creates .venv, installs deps, starts backend + frontend
+                  # then open http://127.0.0.1:5173
+```
+
+Optional, one-time steps:
+
+```bash
+make model        # fetch the local embedding model (checksummed; the only network step)
+make index        # rebuild the reflection index from the ledger (always safe)
+make demo-diary   # build the public-domain diary demo set (needs corpus-data, see below)
+```
+
+Without `make model` the app still works, using word-overlap matching, and the UI says
+so ("shared words only").
+
+To try it quickly: open **Settings → Load demo data**, turn on "Let it ask me a gentle
+question", then open **Journal**.
+
+## Test it
+
+```bash
+make test         # 7 suites across two Python interpreters
+make lint         # ruff
+```
+
+The suites cover the redaction gate against the golden corpus, the MCP server against
+the same corpus, the capture API and hash chain, frozen engine test vectors, an end-to-end
+user journey (capture, import, threads, truths, egress, demo wipe), the reflection
+relevance floors, and the diary converter.
+
+Two interpreters on purpose: `plugin/hooks/*` run as Claude Code hooks under the system
+`python3` (3.9 on the dev machine), so their suites run there to prove compatibility,
+while the app runs in a 3.13 virtualenv. A lint auto-fix once rewrote the hooks to a
+3.11-only API and silently broke the gate; the corpus suite caught it, and the split
+keeps it caught.
+
+CI (GitHub Actions) runs the offline suites on every push. A nightly job calibrates the
+optional LLM classifier tier, and only runs when an API key is configured.
+
+## Design notes
+
+- **Local forever, by architecture.** The journal core never makes a network call and
+  binds localhost only, with a per-session token on API calls to block DNS-rebinding and
+  cross-site requests. Anything social in the future would be a separate opt-in service
+  that receives nothing from the ledger ([ADR 001](docs/adr/001-tiered-architecture.md)).
+- **Append-only, hash-chained ledger as the source of truth.** One JSONL stream per
+  record type (entries, people, truths, and more), each chained to the previous row.
+  SQLite and the vector index are derived views and can be rebuilt at any time. The hash
+  rule is frozen in [a spec with test vectors](docs/spec/engine-v1.md) so a future port
+  can be checked mechanically.
+- **People by role by default.** Identity handling is a written policy
+  ([ADR 002](docs/adr/002-identity-policy.md)): alias-first, names allowed locally,
+  roles enforced on anything that leaves the device.
+- **Precision over recall in reflection.** A wrong pairing implies two unrelated parts
+  of someone's life belong together; a missed one costs nothing. The match floor is set
+  where nothing false gets through, which means roughly half of genuinely related pairs
+  are missed. That trade-off is measured in `tests/fixtures/relevance.json` and written
+  up in [ADR 003](docs/adr/003-reflection-surface.md) rather than hidden.
+- **Honest test data.** Every fixture is invented. Sensitive-looking tokens in the
+  corpus are split with `~~` at rest so the tracked files never contain a matchable
+  identifier; the runners strip the splitter before testing.
+- **Ethics gate on data.** Calibration uses only licensed research corpora or public
+  domain text. The corpus data itself is gitignored (licence hygiene) and re-fetchable
+  from pinned records in `corpus-data/ACQUISITION-LOG.md`.
+
+## Known limitations
+
+Found by running 13 years of a real public-domain diary (Barbellion, *Journal of a
+Disappointed Man*) through the app:
+
+- The name heuristic used by import is tuned for modern casual writing. On literary prose
+  about half of the "who is this?" questions are noise; the demo caps them at 12.
+- The month view only shows the current month, and the Journal view stops at 200 entries,
+  so older imported entries need paging or a year jump.
+- At high writing density almost every entry has a related hint, which weakens the
+  signal. Whether that needs a stronger floor at scale is still open.
+
+Import took 0.6 s, the one-time index build 7 s, and a related-entry lookup 13 ms on that
+data set.
+
+## Repository map
 
 ```
-nambikkai/
-├── plugin/            Claude Code plugin — the redaction gate + provenance skills (the perimeter)
-├── mcp/               trust-gate MCP server — check / redact / tag_fact / lint
-├── corpus/            the golden corpus (synthetic, split at rest) — binds every implementation
-├── conventions/       provenance receipts · trust doctrine · stage-only autonomy
-├── research/          the science, market, law, and data-ethics grounding
-├── tests/             self-tests: corpus drift-guard + gate + server-vs-corpus
-└── docs/              the full documentation
+app/backend/     FastAPI app: ledger, store, importer, reflection index, demo data
+app/frontend/    React + TypeScript + Vite UI
+plugin/          Claude Code plugin: redaction gate hooks + skills
+mcp/             trust-gate MCP server
+corpus/          golden corpus (synthetic) that binds every implementation
+conventions/     provenance receipts, trust doctrine, stage-only autonomy
+docs/            ADRs, engine spec, concepts, recipes, operations
+research/        grounding notes: the science, market, data and law
+tests/           the seven suites, fixtures and frozen vectors
+ops/             dev runner, backup, model fetch, diary converter
+VISION.md        the product roadmap and first principles
+PITCH.md         one-page framing
 ```
+
+## About this copy
+
+This is a public copy of a private working repository. The history has been scrubbed:
+internal working notes (session handoffs, agent operating contracts, account-setup
+runbooks, a runtime alert log) were removed, and references to the author's private
+personal systems, local file paths and unpublished accounts were replaced with neutral
+placeholders. `YOUR-GITHUB-USER` in install commands and docs links stands for wherever
+this repository is published. "life-os" in VISION.md refers to the author's private
+personal-operations system that this journal grew out of; it is not included here.
+
+The name: *நம்பிக்கை (nambikkai)* is Tamil for trust, faith, hope. It is what a journal
+has to earn from a person.
 
 ## License
 
-[MIT](LICENSE) © [publisher TBD]
-
----
-
-*நம்பிக்கை (nambikkai) — Tamil: trust, faith, hope. It used to name a guardrail for
-developers. It now names what a journal has to earn from a person.*
+[MIT](LICENSE)

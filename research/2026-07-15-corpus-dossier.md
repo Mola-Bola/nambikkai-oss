@@ -56,7 +56,7 @@ Also noted, minor: [Qwantify app dataset (OSF)](https://osf.io/sxfrx/) — desir
 - **What:** COVID-19 Emotion Diary with empathy/Theory-of-Mind ground truths — crowdsourced pandemic diaries, expert-reviewed annotations. **It is a Korean-language corpus** (Seoul National University), which yesterday's shortlist didn't flag. ([GitHub](https://github.com/humanfactorspsych/covid19-tom-empathy-diary) · [paper](https://escholarship.org/uc/item/950900w7)) [src: web 2026-07-15]
 - **N:** 19,025 diary documents · 3,805 Korean residents · Oct–Dec 2020 (≈5 entries/person — genuinely longitudinal per-person).
 - **Timestamp/revision:** dated entries over ~3 months; no revision structure.
-- **Licence/access:** CC-BY-NC-SA 4.0, **but train split restricted to researchers at verified institutions** (privacy) — contact contact-removed@example.org. As an individual builder, expect friction or refusal.
+- **Licence/access:** CC-BY-NC-SA 4.0, **but train split restricted to researchers at verified institutions** (privacy) — access by email request to the dataset maintainers (address in the upstream README). As an individual builder, expect friction or refusal.
 - **Ethics gate:** ✅ PASS in principle (consented, PII-excluded), but the verified-institution DUA is the CLPsych problem in miniature — park unless translated Korean data is worth the paperwork.
 - **Schema fit:** feeling + free-text trigger/context + empathy/ToM labels; language mismatch for an English-voice product.
 - **Acquisition:** email request → likely partial (test/val) access. Weeks, uncertain. **Size:** ~40k sentences.

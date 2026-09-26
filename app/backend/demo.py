@@ -274,8 +274,8 @@ DIARY_DIR = os.path.join(
 # one popup at a time would make the demo hostile, so it asks a few.
 #
 # The underlying problem is NOT fixed here on purpose. It is a real finding
-# about the name heuristic at scale, it is written up in STATUS.md, and the
-# call on how to fix it is the owner's.
+# about the name heuristic at scale, it is listed under known limitations in the README,
+# and the fix is still an open design question.
 DIARY_QUESTION_CAP = 12
 
 
